@@ -1,0 +1,54 @@
+name: build
+
+on:
+  push:
+    tags:
+      - "[Vv]?[0-9]+.[0-9]+*"
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vdfsbuilder:
+    name: Create VDF
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get patch name from repository name
+        run: |
+          echo "PATCH_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Get short SHA
+        if: (!startsWith(github.ref, 'refs/tags/'))
+        run: echo "VERSION=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build VDF
+        uses: kirides/vdfsbuilder@v1.1.0
+        with:
+          in: ${{ env.PATCH_NAME }}.vm
+
+      - name: Create release with assests (if tag pushed)
+        if: startsWith(github.ref, 'refs/tags/') && github.event_name != 'release'
+        run: gh release create ${{ env.VERSION }} --generate-notes "${{ env.PATCH_NAME }}.vdf" || exit 0
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Upload release assests (if release published)
+        if: github.event_name == 'release'
+        run: gh release upload ${{ env.VERSION }} "${{ env.PATCH_NAME }}.vdf" || exit 0
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Upload artifacts
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PATCH_NAME }}-${{ env.VERSION }}
+          path: "${{ env.PATCH_NAME }}.vdf"
+          overwrite: true

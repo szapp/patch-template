@@ -1,0 +1,6 @@
+<svg stroke="#888888" width="50px" height="50px" viewBox="8 8 92 92" xmlns="http://www.w3.org/2000/svg">
+    <g class="ldl-scale" style="transform-origin:50% 50% 0px;transform:rotate(0deg) scale(0.8);animation-play-state:paused" >
+        <path d="M22 78l56-56" stroke-miterlimit="10" stroke-width="10" fill="none" ></path>
+        <path d="M78 78L22 22" stroke-miterlimit="10" stroke-width="10" fill="none" ></path>
+    </g>
+</svg>

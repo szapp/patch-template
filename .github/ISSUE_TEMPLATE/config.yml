@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📃 Ninja Documentation
+    url: https://github.com/szapp/Ninja
+    about: Documentation of Ninja.
+  - name: ❔ Questions and Problems
+    url: https://github.com/szapp/patch-template/discussions
+    about: Please ask and answer questions here.

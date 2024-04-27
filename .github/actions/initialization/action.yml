@@ -1,0 +1,19 @@
+name: Initialize
+description: Initialize repository for a new patch
+inputs:
+  parameters:
+    description: 'Project parameters'
+    required: true
+  token:
+    description: 'Github authentication token'
+    default: ${{ github.token }}
+outputs:
+  errors:
+    description: 'Parsing, validation and runtime errors'
+  warnings:
+    description: 'Warnings'
+  infos:
+    description: 'Next stes on successful initialization'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

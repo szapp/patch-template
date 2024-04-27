@@ -1,0 +1,283 @@
+name: ⚡ Initialize the Patch
+description: Configure and initialize the patch
+title: "Setup patch"
+body:
+  # HEADER
+
+  - type: markdown
+    attributes:
+      value: |
+        <div align="center">
+
+        ### ⚡ Create New Patch ⚡
+
+        **This form will aid you in setting up a new patch for <kbd>Gothic</kbd>, <kbd>Gothic Sequel</kbd>, <kbd>Gothic 2</kbd>, and/or <kbd>Gothic 2 NotR</kbd>.**
+
+        </div>
+
+        ---
+
+        > [!Tip]
+        > Familiar with the [documentation of Ninja](https://github.com/szapp/Ninja) first.
+
+  - type: markdown
+    attributes:
+      value: |
+        ### 📑 Patch name and description
+        The name of the patch is essential as it determines the filename of the VDF and the directory tree, and prefixes all script symbol names. The patch description serves as basic information for players visible in the ingame console and inside the VDF. The name can only consist of alpha numerical characters (including underscore) without a leading digit.
+
+        > [!Note]
+        > The <i>name</i> and <i>description</i> of the patch will be taken from this repository's name and description (from the repository details), respectively. For example, if your GitHub repository is <kbd>user/Patch123</kbd>, the patch name will be <kbd>Patch123</kbd>.
+        > If you want to change the name or description of the repository, please do so before you continue.
+
+  - type: markdown
+    attributes:
+      value: |
+        ### 🧰 Resources
+
+        A patch can change various resources (e.g. menu scripts, output units, etc., see documentation). Here, you will select which resources your patch will modify. By default, patches are compatible with <kbd>Gothic</kbd>, <kbd>Gothic Sequel</kbd>, <kbd>Gothic 2</kbd>, and <kbd>Gothic 2 NotR</kbd>. Each resource, you can modify for some, all or none of the games. The patch files will be created with a corresponding game-specific suffix or a single file is created with no suffix if all games are selected.
+
+        If you have any questions, do not hesitate to discuss them [here](https://github.com/szapp/patch-template/discussions).
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 🚀 Let's get started
+      description: Please confirm that you have read the above information.
+      options:
+        - label: I confirm that I want the repository's *name* and *description* to be used for the patch.
+          required: true
+        - label: I have familiarized myself with the documentation of Ninja.
+          required: true
+
+  # CONTENT SCRIPTS
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+
+        ## 🎨 Content scripts
+
+        The content scripts entail everything from NPCs and items to story, events, and some aspects of AI and gameplay mechanics. Because the scripts differ the most between the four different games. They will always come as separate source files (SRC) for each.
+
+  - type: checkboxes
+    id: inject-content
+    attributes:
+      label: Content scripts
+      description: Please choose one, both, or none of the following. If none, skip to the next section.
+      options:
+        - label: Gothic 1
+        - label: Gothic Sequel
+        - label: Gothic 2 Classic
+        - label: Gothic 2 NotR
+
+  - type: checkboxes
+    id: ikarus-lego
+    attributes:
+      label: Ikarus and LeGo
+      description: Will the patch use Ikarus and/or LeGo?
+      options:
+        - label: Ikarus
+        - label: LeGo
+
+  - type: checkboxes
+    id: init-content
+    attributes:
+      label: Content initialization
+      description: |
+        Ninja offers to call a patch-specific initialzation function after `Init_Global` (G2) / `Init_<Levelname>` (G1) was called. This is useful to add your own initializations especially **if** you use Ikarus and LeGo.
+
+        Does the patch need the content initialization function?
+      options:
+        - label: Content initialization function
+
+  - type: checkboxes
+    id: init-menu
+    attributes:
+      label: Menu initialization
+      description: |
+        Ninja also offers a patch-specific initialization function for menus. It is called whenever a menu is opened, including the main menu, before the game even started.
+
+        Does the patch need the menu initialization function?
+      options:
+        - label: Menu initialization function
+
+  # MENU SCRIPTS
+
+  - type: markdown
+    attributes:
+      value: |
+        ## ⚙️ Menu scripts
+
+  - type: checkboxes
+    id: inject-menu
+    attributes:
+      label: Menu scripts
+      description: Please choose one, both, or none of the following. If none, skip to the next section.
+      options:
+        - label: Gothic 1
+        - label: Gothic Sequel
+        - label: Gothic 2 Classic
+        - label: Gothic 2 NotR
+
+  # PFX SCRIPTS
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 🎆 Particle FX scripts
+
+  - type: checkboxes
+    id: inject-pfx
+    attributes:
+      label: Particle FX scripts
+      description: Please choose one, both, or none of the following. If none, skip to the next section.
+      options:
+        - label: Gothic 1
+        - label: Gothic Sequel
+        - label: Gothic 2 Classic
+        - label: Gothic 2 NotR
+
+  # VFX SCRIPTS
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 🪄 Visual FX scripts
+
+  - type: checkboxes
+    id: inject-vfx
+    attributes:
+      label: Visual FX scripts
+      description: Please choose one, both, or none of the following. If none, skip to the next section.
+      options:
+        - label: Gothic 1
+        - label: Gothic Sequel
+        - label: Gothic 2 Classic
+        - label: Gothic 2 NotR
+
+  # SFX SCRIPTS
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 📣 Sound FX scripts
+
+  - type: checkboxes
+    id: inject-sfx
+    attributes:
+      label: Sound FX scripts
+      description: Please choose one, both, or none of the following. If none, skip to the next section.
+      options:
+        - label: Gothic 1
+        - label: Gothic Sequel
+        - label: Gothic 2 Classic
+        - label: Gothic 2 NotR
+
+  # MUSIC SCRIPTS
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 🎶 Music scripts
+
+  - type: checkboxes
+    id: inject-music
+    attributes:
+      label: Music scripts
+      description: Please choose one, both, or none of the following. If none, skip to the next section.
+      options:
+        - label: Gothic 1
+        - label: Gothic Sequel
+        - label: Gothic 2 Classic
+        - label: Gothic 2 NotR
+
+  # CAMERA SCRIPTS
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 📽️ Camera scripts
+
+  - type: checkboxes
+    id: inject-camera
+    attributes:
+      label: Camera scripts
+      description: Please choose one, both, or none of the following. If none, skip to the next section.
+      options:
+        - label: Gothic 1
+        - label: Gothic Sequel
+        - label: Gothic 2 Classic
+        - label: Gothic 2 NotR
+
+  # FAI SCRIPTS
+
+  - type: markdown
+    attributes:
+      value: |
+        ## ⚔️ Fight AI scripts
+
+  - type: checkboxes
+    id: inject-fai
+    attributes:
+      label: Fight AI scripts
+      description: Please choose one, both, or none of the following. If none, skip to the next section.
+      options:
+        - label: Gothic 1
+        - label: Gothic Sequel
+        - label: Gothic 2 Classic
+        - label: Gothic 2 NotR
+
+  # OU
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 💬 Output units (dialog lines)
+
+  - type: checkboxes
+    id: inject-ou
+    attributes:
+      label: Output units
+      description: Please choose one, both, or none of the following. If none, skip to the next section.
+      options:
+        - label: Gothic 1
+        - label: Gothic Sequel
+        - label: Gothic 2 Classic
+        - label: Gothic 2 NotR
+
+  # ANIMATIONS
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 🤸‍♂️ Animations (MDS)
+
+        Note that this refers to the model definitions (MDS files) and not the animations themselves. Changing existing animations (ASC files) does not require this option.
+
+  - type: checkboxes
+    id: inject-ani
+    attributes:
+      label: Animations
+      description: Please choose one, both, or none of the following. If none, skip to the next section.
+      options:
+        - label: Gothic 1
+        - label: Gothic Sequel
+        - label: Gothic 2 Classic
+        - label: Gothic 2 NotR
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+
+        <table><tr><td width="2000">
+
+        Please review your choices before you continue.
+
+        When you are ready, click the button below to initialize this repository based on your choices, setting up file structure for your patch.
+
+        </td></tr></table>
+
+        Once you click <kbd>Submit new issue</kbd>, the script will run and create the necessary files and initialize this repository. This may take a few seconds. You will see the progress as a comment in this issue.

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "../" // Update the rootDir property to the correct path for the source files
+  },
+  "include": ["*.ts", "../src/**/*"],
+  "exclude": ["../dist", "../node_modules", "../coverage", "*.json"]
+}

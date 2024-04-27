@@ -1,0 +1,79 @@
+name: initialize
+
+on:
+  issues:
+    types: opened
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  update:
+    name: Initialize patch
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.issue.body, '### 🚀 Let''s get started')
+    steps:
+      - name: Create issue comment to indicate progress
+        run: |
+          gh issue comment ${{ github.event.issue.number }} -R ${{ github.repository }} \
+          --body 'Initializing the project
+
+          Please wait...
+
+          ![spinner](https://github.com/szapp/patch-template/blob/main/.github/ISSUE_TEMPLATE/progress.svg?raw=true)'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Parse issue
+        id: parse
+        uses: onmax/issue-form-parser@v1.4
+        with:
+          issue_number: ${{ github.event.issue.number }}
+
+      - uses: actions/checkout@v4
+
+      - name: Verify and run file operations
+        id: process
+        uses: ./.github/actions/initialization/
+        with:
+          parameters: ${{ steps.parse.outputs.payload }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Close issue on failure
+        if: failure()
+        run: |
+          gh issue comment ${{ github.event.issue.number }} -R ${{ github.repository }} --edit-last \
+          --body 'Initializing the project
+
+          Failed!
+
+          ![failure](https://github.com/szapp/patch-template/blob/main/.github/ISSUE_TEMPLATE/failure.svg?raw=true)
+          ${{ steps.process.outputs.duration }}
+
+          ${{ steps.process.outputs.errors }}
+
+          ${{ steps.process.outputs.warnings }}
+
+          Please address the error messages and try again by opening a new issue.'
+          gh issue close ${{ github.event.issue.number }} -R ${{ github.repository }} -r 'not planned'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Close issue on success
+        if: success()
+        run: |
+          gh issue comment ${{ github.event.issue.number }} -R ${{ github.repository }} --edit-last \
+          --body 'Initializing the project
+
+          Completed!
+
+          ![success](https://github.com/szapp/patch-template/blob/main/.github/ISSUE_TEMPLATE/success.svg?raw=true)
+          ${{ steps.process.outputs.duration }}
+
+          ${{ steps.process.outputs.warnings }}
+
+          ${{ steps.process.outputs.infos }}'
+          gh issue close ${{ github.event.issue.number }} -R ${{ github.repository }} -r 'completed'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
