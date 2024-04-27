@@ -77,7 +77,7 @@ export async function parseEnv(templateRepo: string): Promise<{
 
   // Check if repository is generated template from source
   const {
-    data: { fork, is_template, template_repository },
+    data: { private: is_private, fork, is_template, template_repository },
   } = await octokit.rest.repos.get(github.context.repo)
   if (fork) {
     // Must not be a fork
@@ -86,7 +86,7 @@ export async function parseEnv(templateRepo: string): Promise<{
       `The repository must not be a fork of the template repository. Please create a new repository, generated from the template ${templateRepo}.`
     )
   }
-  if (template_repository?.full_name !== templateRepo) {
+  if (!is_private && template_repository?.full_name !== templateRepo) {
     // Must be sourced from the template
     throw new VerboseError(
       'Repository must be generated from the official template',

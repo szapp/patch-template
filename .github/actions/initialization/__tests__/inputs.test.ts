@@ -514,6 +514,7 @@ describe('parseEnv', () => {
         repos: {
           get: jest.fn().mockResolvedValue({
             data: {
+              private: false,
               fork: false,
               is_template: false,
               template_repository: {

@@ -35515,12 +35515,12 @@ async function parseEnv(templateRepo) {
     const actorId = data?.id ?? '';
     const userEmail = `${actorId ? actorId + '+' : ''}${username}@users.noreply.github.com`;
     // Check if repository is generated template from source
-    const { data: { fork, is_template, template_repository }, } = await octokit.rest.repos.get(github.context.repo);
+    const { data: { private: is_private, fork, is_template, template_repository }, } = await octokit.rest.repos.get(github.context.repo);
     if (fork) {
         // Must not be a fork
         throw new classes_1.VerboseError('Repository must not be a fork', `The repository must not be a fork of the template repository. Please create a new repository, generated from the template ${templateRepo}.`);
     }
-    if (template_repository?.full_name !== templateRepo) {
+    if (!is_private && template_repository?.full_name !== templateRepo) {
         // Must be sourced from the template
         throw new classes_1.VerboseError('Repository must be generated from the official template', `The repository must be generated from the official template repository. Please create a new repository, generated from the template ${templateRepo}.`);
     }
