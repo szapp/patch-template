@@ -50,7 +50,7 @@ describe('run', () => {
     const outputInfos = '<h3>:one: Test info</h3>Test details'
 
     jest.spyOn(inputs, 'parseEnv').mockResolvedValue(envInputs)
-    jest.spyOn(inputs, 'parsePackage').mockReturnValue({ templateRepo: 'repo', templateRepoUrl: 'repoUrl', licenseType: 'MIT' })
+    jest.spyOn(inputs, 'parsePackage').mockReturnValue({ templateRepo: 'repo', templateRepoUrl: 'repoUrl' })
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     jest.spyOn(inputs, 'parseInputs').mockImplementation((_inputs, _errors) => {
       main.warnings.push(new VerboseError('Test warning', 'Test details'))
@@ -65,6 +65,7 @@ describe('run', () => {
     jest.spyOn(files, 'writeOuFiles').mockResolvedValue()
     jest.spyOn(files, 'writeAnimFiles').mockResolvedValue()
     jest.spyOn(files, 'writeVmScript').mockResolvedValue()
+    jest.spyOn(files, 'writeDotFiles').mockResolvedValue([])
     jest.spyOn(files, 'writeReadme').mockResolvedValue()
     jest.spyOn(files, 'writeLicense').mockResolvedValue()
     jest.spyOn(files, 'removeFiles').mockResolvedValue()
@@ -115,7 +116,7 @@ describe('run', () => {
     expect(files.writeReadme).toHaveBeenCalledWith(patch, 'repo', 'repoUrl')
     expect(files.writeReadme).toHaveReturned()
     expect(files.writeLicense).toHaveBeenCalledTimes(1)
-    expect(files.writeLicense).toHaveBeenCalledWith(patch, 'repo', 'MIT')
+    expect(files.writeLicense).toHaveBeenCalledWith(patch)
     expect(files.writeLicense).toHaveReturned()
     expect(files.removeFiles).toHaveBeenCalledTimes(1)
     expect(files.removeFiles).toHaveBeenCalledWith(patch)
@@ -258,6 +259,7 @@ describe('run', () => {
     jest.spyOn(files, 'writeOuFiles').mockResolvedValue()
     jest.spyOn(files, 'writeAnimFiles').mockResolvedValue()
     jest.spyOn(files, 'writeVmScript').mockResolvedValue()
+    jest.spyOn(files, 'writeDotFiles').mockResolvedValue([])
     jest.spyOn(files, 'writeReadme').mockResolvedValue()
     jest.spyOn(files, 'writeLicense').mockResolvedValue()
     jest.spyOn(files, 'removeFiles').mockResolvedValue()

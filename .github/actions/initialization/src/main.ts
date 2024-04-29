@@ -26,7 +26,7 @@ export async function run(): Promise<void> {
   let patchName: string = ''
   try {
     // Ensure valid environment (terminate on error)
-    const { templateRepo, templateRepoUrl, licenseType } = parsePackage(errors)
+    const { templateRepo, templateRepoUrl } = parsePackage(errors)
     const envInputs = await parseEnv(templateRepo)
 
     // Parse inputs and aggregate errors (no errors thrown here)
@@ -53,8 +53,9 @@ export async function run(): Promise<void> {
       files.writeOuFiles(patch),
       files.writeAnimFiles(patch),
       files.writeVmScript(patch),
+      files.writeDotFiles(),
       files.writeReadme(patch, templateRepo, templateRepoUrl),
-      files.writeLicense(patch, templateRepo, licenseType),
+      files.writeLicense(patch),
       files.removeFiles(patch),
       setupIdentity(patch),
     ])

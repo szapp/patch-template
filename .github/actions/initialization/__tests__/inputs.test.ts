@@ -738,7 +738,6 @@ describe('parsePackage', () => {
       repository: {
         url: 'https://github.com/username/repo.git',
       },
-      license: 'MIT',
     }
     readFileSyncMock.mockReturnValue(JSON.stringify(metadata))
 
@@ -749,7 +748,6 @@ describe('parsePackage', () => {
     expect(result).toEqual({
       templateRepo: 'username/repo',
       templateRepoUrl: 'https://github.com/username/repo',
-      licenseType: 'MIT',
     })
     expect(errors.length).toBe(0)
   })
@@ -769,7 +767,6 @@ describe('parsePackage', () => {
     expect(result).toEqual({
       templateRepo: 'username/repo',
       templateRepoUrl: 'https://github.com/username/repo',
-      licenseType: 'MIT',
     })
     expect(errors.length).toBe(0)
   })
@@ -779,7 +776,6 @@ describe('parsePackage', () => {
       repository: {
         url: 'https://example.com',
       },
-      license: 'ISC',
     }
     readFileSyncMock.mockReturnValue(JSON.stringify(metadata))
 
@@ -790,7 +786,6 @@ describe('parsePackage', () => {
     expect(result).toEqual({
       templateRepo: 'Template repository',
       templateRepoUrl: 'https://example.com',
-      licenseType: 'ISC',
     })
     expect(errors.length).toBe(0)
   })
@@ -804,7 +799,7 @@ describe('parsePackage', () => {
     const result = inputs.parsePackage(errors)
     expect(parsePackageMock).toHaveReturned()
     expect(readFileSyncMock).toHaveBeenCalledWith('.github/actions/initialization/package.json', 'utf8')
-    expect(result).toEqual({ licenseType: '', templateRepo: '', templateRepoUrl: '' })
+    expect(result).toEqual({ templateRepo: '', templateRepoUrl: '' })
     expect(errors.length).toBe(1)
     expect(errors[0]).toEqual(
       new VerboseError(

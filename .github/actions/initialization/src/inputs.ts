@@ -104,15 +104,13 @@ export async function parseEnv(templateRepo: string): Promise<{
   return { name: patchName, description, url, repo, username, usernameFull, userEmail }
 }
 
-export function parsePackage(errors: VerboseError[]): { templateRepo: string; templateRepoUrl: string; licenseType: string } {
+export function parsePackage(errors: VerboseError[]): { templateRepo: string; templateRepoUrl: string } {
   let templateRepo = ''
   let templateRepoUrl = ''
-  let licenseType = ''
   try {
     const metadata = JSON.parse(fs.readFileSync('.github/actions/initialization/package.json', 'utf8'))
     templateRepoUrl = (metadata.repository.url as string).replace(/^git\+/, '').replace(/\.git$/, '')
     templateRepo = /(?<=\/)[^/]+\/[^/]+$/.exec(templateRepoUrl)?.[0] ?? 'Template repository'
-    licenseType = metadata.license ?? 'MIT'
   } catch (error) {
     errors.push(
       new VerboseError(
@@ -121,7 +119,7 @@ export function parsePackage(errors: VerboseError[]): { templateRepo: string; te
       )
     )
   }
-  return { templateRepo, templateRepoUrl, licenseType }
+  return { templateRepo, templateRepoUrl }
 }
 
 export function checkPatchName(name: string, errors: VerboseError[]): void {

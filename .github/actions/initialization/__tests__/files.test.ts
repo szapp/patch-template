@@ -773,23 +773,20 @@ describe('writeLicense', () => {
     const patch: InputParameters = {
       usernameFull: 'John Doe',
     } as InputParameters
-    const templateRepo = 'template/repo'
-    const licenseType = 'MIT'
     jest
       .spyOn(fs, 'readFile')
       .mockImplementation(async (file) =>
         (file as string).includes('GothicMOD-Lizenz.txt') ? 'Copyright (c) 20[jj] [Inhaber der ausschließlichen Nutzungsrechte].' : ''
       )
 
-    await files.writeLicense(patch, templateRepo, licenseType)
+    await files.writeLicense(patch)
     expect(writeLicenseMock).toHaveReturned()
-    expect(fs.readFile).toHaveBeenCalledTimes(3)
+    expect(fs.readFile).toHaveBeenCalledTimes(2)
     expect(fs.readFile).toHaveBeenCalledWith(path.join('.github', 'actions', 'initialization', 'licenses', 'GothicMOD-Lizenz.txt'), 'utf8')
     expect(fs.readFile).toHaveBeenCalledWith(
       path.join('.github', 'actions', 'initialization', 'licenses', 'GOTHIC_MOD_Development_Kit.txt'),
       'utf8'
     )
-    expect(fs.readFile).toHaveBeenCalledWith('LICENSE', 'utf8')
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
     expect(fs.writeFile).toHaveBeenNthCalledWith(
       1,

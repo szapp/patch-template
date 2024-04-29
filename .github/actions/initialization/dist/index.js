@@ -35302,21 +35302,14 @@ The patch template can found at ${templateRepoUrl}.
 `);
 }
 exports.writeReadme = writeReadme;
-async function writeLicense(patch, templateRepo, licenseType) {
-    const [licenseTextG1, licenseTextG2, licenseTextTemplate] = await Promise.all([
+async function writeLicense(patch) {
+    const [licenseTextG1, licenseTextG2] = await Promise.all([
         promises_1.default.readFile(path_1.default.join('.github', 'actions', 'initialization', 'licenses', 'GOTHIC_MOD_Development_Kit.txt'), 'utf8'),
         promises_1.default.readFile(path_1.default.join('.github', 'actions', 'initialization', 'licenses', 'GothicMOD-Lizenz.txt'), 'utf8'),
-        promises_1.default.readFile('LICENSE', 'utf8'),
     ]);
     const licenses = licenseTextG2.replace('20[jj] [Inhaber der ausschließlichen Nutzungsrechte]', new Date().getUTCFullYear() + ' ' + patch.usernameFull) +
         '\n\n' +
-        licenseTextG1 +
-        '\n\n' +
-        templateRepo +
-        '\n' +
-        licenseType +
-        '\n' +
-        licenseTextTemplate;
+        licenseTextG1;
     return promises_1.default.writeFile('LICENSE', licenses, 'utf8');
 }
 exports.writeLicense = writeLicense;
@@ -35534,17 +35527,15 @@ exports.parseEnv = parseEnv;
 function parsePackage(errors) {
     let templateRepo = '';
     let templateRepoUrl = '';
-    let licenseType = '';
     try {
         const metadata = JSON.parse(fs_1.default.readFileSync('.github/actions/initialization/package.json', 'utf8'));
         templateRepoUrl = metadata.repository.url.replace(/^git\+/, '').replace(/\.git$/, '');
         templateRepo = /(?<=\/)[^/]+\/[^/]+$/.exec(templateRepoUrl)?.[0] ?? 'Template repository';
-        licenseType = metadata.license ?? 'MIT';
     }
     catch (error) {
         errors.push(new classes_1.VerboseError('Missing package metadata', 'The template repository metadata could not be accessed. This should not have happened. Please try again. If the error persists, please report it. Please note that this process only works from the original template repository.'));
     }
-    return { templateRepo, templateRepoUrl, licenseType };
+    return { templateRepo, templateRepoUrl };
 }
 exports.parsePackage = parsePackage;
 function checkPatchName(name, errors) {
@@ -35629,7 +35620,7 @@ async function run() {
     let patchName = '';
     try {
         // Ensure valid environment (terminate on error)
-        const { templateRepo, templateRepoUrl, licenseType } = (0, inputs_1.parsePackage)(exports.errors);
+        const { templateRepo, templateRepoUrl } = (0, inputs_1.parsePackage)(exports.errors);
         const envInputs = await (0, inputs_1.parseEnv)(templateRepo);
         // Parse inputs and aggregate errors (no errors thrown here)
         const { name, description } = envInputs;
@@ -35652,8 +35643,9 @@ async function run() {
             files.writeOuFiles(patch),
             files.writeAnimFiles(patch),
             files.writeVmScript(patch),
+            files.writeDotFiles(),
             files.writeReadme(patch, templateRepo, templateRepoUrl),
-            files.writeLicense(patch, templateRepo, licenseType),
+            files.writeLicense(patch),
             files.removeFiles(patch),
             (0, git_1.setupIdentity)(patch),
         ]);

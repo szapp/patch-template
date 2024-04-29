@@ -350,22 +350,15 @@ The patch template can found at ${templateRepoUrl}.
   )
 }
 
-export async function writeLicense(patch: InputParameters, templateRepo: string, licenseType: string): Promise<void> {
-  const [licenseTextG1, licenseTextG2, licenseTextTemplate] = await Promise.all([
+export async function writeLicense(patch: InputParameters): Promise<void> {
+  const [licenseTextG1, licenseTextG2] = await Promise.all([
     fs.readFile(path.join('.github', 'actions', 'initialization', 'licenses', 'GOTHIC_MOD_Development_Kit.txt'), 'utf8'),
     fs.readFile(path.join('.github', 'actions', 'initialization', 'licenses', 'GothicMOD-Lizenz.txt'), 'utf8'),
-    fs.readFile('LICENSE', 'utf8'),
   ])
   const licenses =
     licenseTextG2.replace('20[jj] [Inhaber der ausschließlichen Nutzungsrechte]', new Date().getUTCFullYear() + ' ' + patch.usernameFull) +
     '\n\n' +
-    licenseTextG1 +
-    '\n\n' +
-    templateRepo +
-    '\n' +
-    licenseType +
-    '\n' +
-    licenseTextTemplate
+    licenseTextG1
   return fs.writeFile('LICENSE', licenses, 'utf8')
 }
 
