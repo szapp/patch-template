@@ -35311,7 +35311,8 @@ ${compatible}
 2. Copy the file \`${patch.name}.vdf\` to \`[Gothic]\\Data\\\`. To uninstall, remove the file again.
 
 <!--
-The patch is also available in
+The patch is also available on
+- [World of Gothic](https://www.worldofgothic.de/dl/download_XXXX.htm) | [Forum thread](https://forum.worldofplayers.de/forum/threads/XXXXXXX)
 - [Spine Mod-Manager](https://clockwork-origins.com/spine/)
 ${patch.needsVersions.includes(1) ? '- [Steam Workshop Gothic 1](https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX)\n' : ''}${patch.needsVersions.includes(2) ? '- [Steam Workshop Gothic 2](https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX)\n' : ''}-->
 

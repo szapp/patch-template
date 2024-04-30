@@ -693,7 +693,8 @@ It supports <kbd>Gothic 1</kbd>, <kbd>Gothic Sequel</kbd>, <kbd>Gothic II (Class
 2. Copy the file \`testPatch.vdf\` to \`[Gothic]\\Data\\\`. To uninstall, remove the file again.
 
 <!--
-The patch is also available in
+The patch is also available on
+- [World of Gothic](https://www.worldofgothic.de/dl/download_XXXX.htm) | [Forum thread](https://forum.worldofplayers.de/forum/threads/XXXXXXX)
 - [Spine Mod-Manager](https://clockwork-origins.com/spine/)
 - [Steam Workshop Gothic 1](https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX)
 - [Steam Workshop Gothic 2](https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX)
@@ -752,7 +753,8 @@ It supports <kbd>Gothic Sequel</kbd> only.
 2. Copy the file \`testPatch.vdf\` to \`[Gothic]\\Data\\\`. To uninstall, remove the file again.
 
 <!--
-The patch is also available in
+The patch is also available on
+- [World of Gothic](https://www.worldofgothic.de/dl/download_XXXX.htm) | [Forum thread](https://forum.worldofplayers.de/forum/threads/XXXXXXX)
 - [Spine Mod-Manager](https://clockwork-origins.com/spine/)
 -->
 
