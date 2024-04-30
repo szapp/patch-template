@@ -256,7 +256,22 @@ ignore-resource:
 *.[bB][iI][kK] linguist-detectable=false
 `
 
-  return Promise.all([fs.writeFile('.validator.yml', contentValidatorYml), fs.writeFile('.gitattributes', contentGitAttributes)])
+  // Dependabot configuration file
+  const contentDependabotYml = `# This file is keeps the GitHub Actions up-to-date
+# For more information, visit https://docs.github.com/en/code-security/dependabot
+version: 2
+updates:
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "weekly"
+`
+
+  return Promise.all([
+    fs.writeFile('.validator.yml', contentValidatorYml),
+    fs.writeFile('.gitattributes', contentGitAttributes),
+    fs.writeFile('.github/dependabot.yml', contentDependabotYml),
+  ])
 }
 
 export async function writeReadme(patch: InputParameters, templateRepo: string, templateRepoUrl: string): Promise<void> {

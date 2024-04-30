@@ -35208,7 +35208,21 @@ ignore-resource:
 # Video files
 *.[bB][iI][kK] linguist-detectable=false
 `;
-    return Promise.all([promises_1.default.writeFile('.validator.yml', contentValidatorYml), promises_1.default.writeFile('.gitattributes', contentGitAttributes)]);
+    // Dependabot configuration file
+    const contentDependabotYml = `# This file is keeps the GitHub Actions up-to-date
+# For more information, visit https://docs.github.com/en/code-security/dependabot
+version: 2
+updates:
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "weekly"
+`;
+    return Promise.all([
+        promises_1.default.writeFile('.validator.yml', contentValidatorYml),
+        promises_1.default.writeFile('.gitattributes', contentGitAttributes),
+        promises_1.default.writeFile('.github/dependabot.yml', contentDependabotYml),
+    ]);
 }
 exports.writeDotFiles = writeDotFiles;
 async function writeReadme(patch, templateRepo, templateRepoUrl) {

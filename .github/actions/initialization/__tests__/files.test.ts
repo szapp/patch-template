@@ -649,6 +649,7 @@ describe('writeDotFiles', () => {
     expect(writeDotFilesMock).toHaveReturned()
     expect(fs.writeFile).toHaveBeenCalledWith('.validator.yml', expect.stringContaining('prefix:\nignore-declaration:\nignore-resource:'))
     expect(fs.writeFile).toHaveBeenCalledWith('.gitattributes', expect.stringContaining('* text=auto eol=lf'))
+    expect(fs.writeFile).toHaveBeenCalledWith('.github/dependabot.yml', expect.stringContaining('package-ecosystem'))
   })
 })
 
