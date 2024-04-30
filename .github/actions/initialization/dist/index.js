@@ -35218,10 +35218,21 @@ updates:
   schedule:
     interval: "weekly"
 `;
+    // Relase notes configuration files
+    const contentReleaseYml = `# This file excludes bot authors from the automatically generated release notes
+# For more information, visit https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes#configuring-automatically-generated-release-notes
+
+changelog:
+  exclude:
+    authors:
+      - dependabot
+      - github-actions
+`;
     return Promise.all([
         promises_1.default.writeFile('.validator.yml', contentValidatorYml),
         promises_1.default.writeFile('.gitattributes', contentGitAttributes),
         promises_1.default.writeFile('.github/dependabot.yml', contentDependabotYml),
+        promises_1.default.writeFile('.github/release.yml', contentReleaseYml),
     ]);
 }
 exports.writeDotFiles = writeDotFiles;

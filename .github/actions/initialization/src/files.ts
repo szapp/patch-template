@@ -267,10 +267,22 @@ updates:
     interval: "weekly"
 `
 
+  // Relase notes configuration files
+  const contentReleaseYml = `# This file excludes bot authors from the automatically generated release notes
+# For more information, visit https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes#configuring-automatically-generated-release-notes
+
+changelog:
+  exclude:
+    authors:
+      - dependabot
+      - github-actions
+`
+
   return Promise.all([
     fs.writeFile('.validator.yml', contentValidatorYml),
     fs.writeFile('.gitattributes', contentGitAttributes),
     fs.writeFile('.github/dependabot.yml', contentDependabotYml),
+    fs.writeFile('.github/release.yml', contentReleaseYml),
   ])
 }
 
