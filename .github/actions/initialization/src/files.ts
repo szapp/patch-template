@@ -218,6 +218,10 @@ ignore-declaration:
 ignore-resource:
 `
 
+  // Git ignore file
+  const contentGitIgnore = `*.vdf
+`
+
   // Git attributes file
   const contentGitAttributes = `* text=auto eol=lf
 
@@ -280,6 +284,7 @@ changelog:
 
   return Promise.all([
     fs.writeFile('.validator.yml', contentValidatorYml),
+    fs.writeFile('.gitignore', contentGitIgnore),
     fs.writeFile('.gitattributes', contentGitAttributes),
     fs.writeFile('.github/dependabot.yml', contentDependabotYml),
     fs.writeFile('.github/release.yml', contentReleaseYml),
@@ -391,7 +396,7 @@ export async function writeLicense(patch: InputParameters): Promise<void> {
 }
 
 export async function removeFiles(patch: InputParameters): Promise<void> {
-  const delFiles = ['.gitignore', '.github/workflows/init.yml', '.github/ISSUE_TEMPLATE', '.github/FUNDING.yml', '.github/actions']
+  const delFiles = ['.github/workflows/init.yml', '.github/ISSUE_TEMPLATE', '.github/FUNDING.yml', '.github/actions']
   if (!patch.needsScripts) delFiles.push('.github/workflows/scripts.yml')
   await Promise.all(delFiles.map((file) => io.rmRF(file)))
 }

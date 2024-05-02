@@ -895,14 +895,14 @@ describe('checkPatchDesc', () => {
   })
 
   it('adds error for patch description that is too long', () => {
-    const description = 'a'.repeat(251 - 3 * 3 - 23) + '%%N'.repeat(3) + '1_-!@#%*(){}[]:;?/.,\\`~'
+    const description = 'a'.repeat(255 + 3 - 3 * 3 - 23) + '%%N'.repeat(3) + '1_-!@#%*(){}[]:;?/.,\\`~'
     const errors: VerboseError[] = []
 
-    expect(description.length).toBe(251)
+    expect(description.length).toBe(255 + 3)
     inputs.checkPatchDesc(description, errors)
     expect(checkPatchDescMock).toHaveReturned()
     expect(errors.length).toBe(1)
-    expect(errors[0].message).toBe('The patch description may not exceed 250 characters')
+    expect(errors[0].message).toBe('The patch description may not exceed 254 characters')
   })
 
   it('adds error for patch description with illegal characters', () => {
@@ -926,14 +926,14 @@ describe('checkPatchDesc', () => {
   })
 
   it('adds error for patch description violating all rules', () => {
-    const description = 'a'.repeat(251 - 4 * 3 - 23 - 4) + '%%N'.repeat(4) + '1_-!@#%*(){}[]:;?/.,\\`~' + '><|&'
+    const description = 'a'.repeat(255 + 4 - 4 * 3 - 23 - 4) + '%%N'.repeat(4) + '1_-!@#%*(){}[]:;?/.,\\`~' + '><|&'
     const errors: VerboseError[] = []
 
-    expect(description.length).toBe(251)
+    expect(description.length).toBe(255 + 4)
     inputs.checkPatchDesc(description, errors)
     expect(checkPatchDescMock).toHaveReturned()
     expect(errors.length).toBe(3)
-    expect(errors[0].message).toBe('The patch description may not exceed 250 characters')
+    expect(errors[0].message).toBe('The patch description may not exceed 254 characters')
     expect(errors[1].message).toBe('The patch description may not contain the characters `><|&`')
     expect(errors[2].message).toBe('The patch description may not contain more than 3 line breaks (%%N)')
   })

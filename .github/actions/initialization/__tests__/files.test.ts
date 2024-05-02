@@ -648,6 +648,7 @@ describe('writeDotFiles', () => {
     await files.writeDotFiles()
     expect(writeDotFilesMock).toHaveReturned()
     expect(fs.writeFile).toHaveBeenCalledWith('.validator.yml', expect.stringContaining('prefix:\nignore-declaration:\nignore-resource:'))
+    expect(fs.writeFile).toHaveBeenCalledWith('.gitignore', expect.stringContaining('*.vdf'))
     expect(fs.writeFile).toHaveBeenCalledWith('.gitattributes', expect.stringContaining('* text=auto eol=lf'))
     expect(fs.writeFile).toHaveBeenCalledWith('.github/dependabot.yml', expect.stringContaining('package-ecosystem'))
     expect(fs.writeFile).toHaveBeenCalledWith('.github/release.yml', expect.stringContaining('dependabot'))
@@ -809,8 +810,7 @@ describe('removeFiles', () => {
 
     await files.removeFiles(patch)
     expect(removeFilesMock).toHaveReturned()
-    expect(io.rmRF).toHaveBeenCalledTimes(5)
-    expect(io.rmRF).toHaveBeenCalledWith('.gitignore')
+    expect(io.rmRF).toHaveBeenCalledTimes(4)
     expect(io.rmRF).toHaveBeenCalledWith('.github/workflows/init.yml')
     expect(io.rmRF).toHaveBeenCalledWith('.github/ISSUE_TEMPLATE')
     expect(io.rmRF).toHaveBeenCalledWith('.github/FUNDING.yml')
@@ -825,8 +825,7 @@ describe('removeFiles', () => {
 
     await files.removeFiles(patch)
     expect(removeFilesMock).toHaveReturned()
-    expect(io.rmRF).toHaveBeenCalledTimes(6)
-    expect(io.rmRF).toHaveBeenCalledWith('.gitignore')
+    expect(io.rmRF).toHaveBeenCalledTimes(5)
     expect(io.rmRF).toHaveBeenCalledWith('.github/workflows/init.yml')
     expect(io.rmRF).toHaveBeenCalledWith('.github/ISSUE_TEMPLATE')
     expect(io.rmRF).toHaveBeenCalledWith('.github/FUNDING.yml')

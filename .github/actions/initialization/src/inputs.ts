@@ -134,13 +134,14 @@ export function checkPatchName(name: string, errors: VerboseError[]): void {
 export function checkPatchDesc(description: string, errors: VerboseError[]): void {
   const details =
     'The repository description is used as a brief sentence describing the patch. It serves as basic information for players in the ingame console and inside the VDF. Maximum length is 250 characters. Illegal characters: ><|& You may use %%N for line breaks. No more than three lines are supported.'
-  if (description.length > 250) {
-    errors.push(new VerboseError('The patch description may not exceed 250 characters', details))
+  const numNL = (description.match(/%%N/g) || []).length
+  if (description.length - numNL > 254) {
+    errors.push(new VerboseError('The patch description may not exceed 254 characters', details))
   }
   if (!/^[^><|&]*$/.test(description)) {
     errors.push(new VerboseError('The patch description may not contain the characters `><|&`', details))
   }
-  if ((description.match(/%%N/g) || []).length > 3) {
+  if (numNL > 3) {
     errors.push(new VerboseError('The patch description may not contain more than 3 line breaks (%%N)', details))
   }
 }
