@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build VDF
-        uses: kirides/vdfsbuilder@bf80e39372967d9b473f3e1e6520e725e602f73e
+        uses: kirides/vdfsbuilder@aaf901f0c98245af54102a1946d8be0e2e17ba36
         with:
           in: ${{ env.PATCH_NAME }}.vm
 
