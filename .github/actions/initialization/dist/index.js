@@ -34590,10 +34590,15 @@ exports.ZodPipeline = ZodPipeline;
 class ZodReadonly extends ZodType {
     _parse(input) {
         const result = this._def.innerType._parse(input);
-        if ((0, parseUtil_1.isValid)(result)) {
-            result.value = Object.freeze(result.value);
-        }
-        return result;
+        const freeze = (data) => {
+            if ((0, parseUtil_1.isValid)(data)) {
+                data.value = Object.freeze(data.value);
+            }
+            return data;
+        };
+        return (0, parseUtil_1.isAsync)(result)
+            ? result.then((data) => freeze(data))
+            : freeze(result);
     }
     unwrap() {
         return this._def.innerType;
@@ -34999,7 +35004,7 @@ async function writeContentSrcFiles(patch) {
             if (patch.needsInit)
                 content += '\n\nContent\\init.d';
             content += '\n'; // Trailing newline is important for parsing
-            return promises_1.default.writeFile(path_1.default.join('Ninja', patch.name, `Content_G${version}.src`), content);
+            return promises_1.default.writeFile(path_1.default.join('Ninja', patch.name, `Content_G${version}.src`), content, 'ascii');
         }));
     }
 }
@@ -35137,7 +35142,7 @@ _work\\Data\\Worlds\\*.ZEN
 ; Ninja resources
 Ninja\\${patch.name}\\* -r
 
-; Lincense and README
+; License and README
 LICENSE
 README.md
 
@@ -35154,19 +35159,24 @@ _work\\Data\\Scripts\\* -r
 *.vm
 *.vdf
 *.bat
+*.cfg
 .*
 
 [INCLUDE]
+; License and README
+LICENSE
+README.md
 
 [ENDVDF]
 `;
     return promises_1.default.writeFile(`${patch.name}.vm`, content);
 }
 exports.writeVmScript = writeVmScript;
-async function writeDotFiles() {
+async function writeDotFiles(patch) {
     // Patch validator configuration file
     const contentValidatorYml = `# This file is required for the patch-validator to work and may contain advanced configuration options
 # For more information, visit https://github.com/szapp/patch-validator/#configuration
+
 prefix:
 ignore-declaration:
 ignore-resource:
@@ -35175,41 +35185,58 @@ ignore-resource:
     const contentGitIgnore = `*.vdf
 `;
     // Git attributes file
-    const contentGitAttributes = `* text=auto eol=lf
+    const contentGitAttributes = `# Checkout line endings based on OS (do not force crlf where not necessary)
+* text=auto
 
-# Exlcude (semi-) binary resources
+# Checkout Windows-style line endings and ensure correct encoding
+# Encoding is not localization but fixed zSTRING::Upper code page handling!
+# See https://forum.worldofplayers.de/forum/threads/1537187/page3
+# and https://forum.worldofplayers.de/forum/threads/759496
+*.[dD] text working-tree-encoding=CP1252 eol=crlf
+*.[cC][sS][lL] text working-tree-encoding=CP1252 linguist-detectable=false
+
+# Exclude (semi-) binary resources from linguist stats
+
+# Output units
+*.[bB][iI][nN] binary linguist-detectable=false
 
 # Animation files
-*.[aA][sS][cC] linguist-detectable=false
-*.[mM][dD][sS] linguist-detectable=false
-*.[mM][dD][mM] linguist-detectable=false
-*.[mM][mM][bB] linguist-detectable=false
-*.[mM][aA][nN] linguist-detectable=false
-*.[mM][dD][lL] linguist-detectable=false
-*.[sS][sS][cC] linguist-detectable=false
+*.[aA][sS][cC] text linguist-detectable=false
+*.[mM][dD][sS] text linguist-detectable=false
+*.[mM][aA][nN] binary linguist-detectable=false
+*.[mM][dD][hH] binary linguist-detectable=false
+*.[mM][dD][lL] binary linguist-detectable=false
+*.[mM][dD][mM] binary linguist-detectable=false
+*.[mM][mM][bB] binary linguist-detectable=false
+*.[mM][sS][bB] binary linguist-detectable=false
+*.[sS][sS][cC] binary linguist-detectable=false
 
 # Graphic files
-*.[tT][gG][aA] linguist-detectable=false
-*.[tT][eE][xX] linguist-detectable=false
-*.[fF][nN][tT] linguist-detectable=false
+*.[tT][gG][aA] binary linguist-detectable=false
+*.[tT][eE][xX] binary linguist-detectable=false
+*.[fF][nN][tT] binary linguist-detectable=false
 
-# Mesh files
-*.3[dD][sS]    linguist-detectable=false
-*.[mM][rR][mM] linguist-detectable=false
-*.[zZ][eE][nN] linguist-detectable=false
+# Mesh files (ZEN might be ASCII or binary)
+*.3[dD][sS]    binary linguist-detectable=false
+*.[mM][rR][mM] binary linguist-detectable=false
+*.[mM][sS][hH] binary linguist-detectable=false
+*.[zZ][eE][nN] text=auto linguist-detectable=false
 
 # Music files
-*.[dD][lL][sS] linguist-detectable=false
-*.[sS][tT][yY] linguist-detectable=false
-*.[sS][gG][tT] linguist-detectable=false
+*.[dD][lL][sS] binary linguist-detectable=false
+*.[sS][tT][yY] binary linguist-detectable=false
+*.[sS][gG][tT] binary linguist-detectable=false
 
 # Sound files
-*.[wW][aA][vV] linguist-detectable=false
-*.[oO][gG][gG] linguist-detectable=false
-*.[mM][pP]3    linguist-detectable=false
+*.[wW][aA][vV] binary linguist-detectable=false
+*.[oO][gG][gG] binary linguist-detectable=false
+*.[mM][pP]3    binary linguist-detectable=false
 
 # Video files
-*.[bB][iI][kK] linguist-detectable=false
+*.[bB][iI][kK] binary linguist-detectable=false
+
+# VDF in case committed (mixed binary and text)
+*.[vV][dD][fF] binary linguist-detectable=false
 `;
     // Dependabot configuration file
     const contentDependabotYml = `# This file is keeps the GitHub Actions up-to-date
@@ -35231,12 +35258,20 @@ changelog:
       - dependabot
       - github-actions
 `;
+    // Spine dependencies
+    const contentToolCfg = `; This file adds dependencies for Spine
+; For more information, visit https://clockwork-origins.com/spine-tutorial-tool-cfg/
+
+[DEPENDENCIES]
+Required=314
+`;
     return Promise.all([
         promises_1.default.writeFile('.validator.yml', contentValidatorYml),
         promises_1.default.writeFile('.gitignore', contentGitIgnore),
         promises_1.default.writeFile('.gitattributes', contentGitAttributes),
         promises_1.default.writeFile('.github/dependabot.yml', contentDependabotYml),
         promises_1.default.writeFile('.github/release.yml', contentReleaseYml),
+        patch.needsNinja ? promises_1.default.writeFile('tool.cfg', contentToolCfg) : undefined,
     ]);
 }
 exports.writeDotFiles = writeDotFiles;
@@ -35674,7 +35709,7 @@ async function run() {
             files.writeOuFiles(patch),
             files.writeAnimFiles(patch),
             files.writeVmScript(patch),
-            files.writeDotFiles(),
+            files.writeDotFiles(patch),
             files.writeReadme(patch, templateRepo, templateRepoUrl),
             files.writeLicense(patch),
             files.removeFiles(patch),

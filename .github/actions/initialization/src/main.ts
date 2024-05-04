@@ -53,7 +53,7 @@ export async function run(): Promise<void> {
       files.writeOuFiles(patch),
       files.writeAnimFiles(patch),
       files.writeVmScript(patch),
-      files.writeDotFiles(),
+      files.writeDotFiles(patch),
       files.writeReadme(patch, templateRepo, templateRepoUrl),
       files.writeLicense(patch),
       files.removeFiles(patch),

@@ -193,19 +193,23 @@ describe('writeContentSrcFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledTimes(4)
     expect(fs.writeFile).toHaveBeenCalledWith(
       path.join(basePath, 'Content_G1.src'),
-      'Ikarus\nLeGo\n\n// LIST YOUR FILES HERE\n\nContent\\init.d\n'
+      'Ikarus\nLeGo\n\n// LIST YOUR FILES HERE\n\nContent\\init.d\n',
+      'ascii'
     )
     expect(fs.writeFile).toHaveBeenCalledWith(
       path.join(basePath, 'Content_G112.src'),
-      'Ikarus\nLeGo\n\n// LIST YOUR FILES HERE\n\nContent\\init.d\n'
+      'Ikarus\nLeGo\n\n// LIST YOUR FILES HERE\n\nContent\\init.d\n',
+      'ascii'
     )
     expect(fs.writeFile).toHaveBeenCalledWith(
       path.join(basePath, 'Content_G130.src'),
-      'Ikarus\nLeGo\n\n// LIST YOUR FILES HERE\n\nContent\\init.d\n'
+      'Ikarus\nLeGo\n\n// LIST YOUR FILES HERE\n\nContent\\init.d\n',
+      'ascii'
     )
     expect(fs.writeFile).toHaveBeenCalledWith(
       path.join(basePath, 'Content_G2.src'),
-      'Ikarus\nLeGo\n\n// LIST YOUR FILES HERE\n\nContent\\init.d\n'
+      'Ikarus\nLeGo\n\n// LIST YOUR FILES HERE\n\nContent\\init.d\n',
+      'ascii'
     )
   })
 
@@ -222,7 +226,7 @@ describe('writeContentSrcFiles', () => {
     await files.writeContentSrcFiles(patch)
     expect(writeContentSrcFilesMock).toHaveReturned()
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
-    expect(fs.writeFile).toHaveBeenCalledWith(path.join(basePath, 'Content_G1.src'), 'Ikarus\n\n// LIST YOUR FILES HERE\n')
+    expect(fs.writeFile).toHaveBeenCalledWith(path.join(basePath, 'Content_G1.src'), 'Ikarus\n\n// LIST YOUR FILES HERE\n', 'ascii')
   })
 
   it('should write only one content source file without ikarus and lego', async () => {
@@ -238,7 +242,7 @@ describe('writeContentSrcFiles', () => {
     await files.writeContentSrcFiles(patch)
     expect(writeContentSrcFilesMock).toHaveReturned()
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
-    expect(fs.writeFile).toHaveBeenCalledWith(path.join(basePath, 'Content_G2.src'), '\n// LIST YOUR FILES HERE\n')
+    expect(fs.writeFile).toHaveBeenCalledWith(path.join(basePath, 'Content_G2.src'), '\n// LIST YOUR FILES HERE\n', 'ascii')
   })
 
   it('should write no content source file', async () => {
@@ -645,13 +649,39 @@ describe('writeVmScript', () => {
 
 describe('writeDotFiles', () => {
   it('should write all dot files', async () => {
-    await files.writeDotFiles()
+    const patch: InputParameters = {
+      name: 'testPatch',
+      description: 'Test patch description',
+      needsNinja: true,
+    } as InputParameters
+
+    await files.writeDotFiles(patch)
     expect(writeDotFilesMock).toHaveReturned()
+    expect(fs.writeFile).toHaveBeenCalledTimes(6)
     expect(fs.writeFile).toHaveBeenCalledWith('.validator.yml', expect.stringContaining('prefix:\nignore-declaration:\nignore-resource:'))
     expect(fs.writeFile).toHaveBeenCalledWith('.gitignore', expect.stringContaining('*.vdf'))
-    expect(fs.writeFile).toHaveBeenCalledWith('.gitattributes', expect.stringContaining('* text=auto eol=lf'))
+    expect(fs.writeFile).toHaveBeenCalledWith('.gitattributes', expect.stringContaining('*.[dD] text working-tree-encoding=CP1252'))
     expect(fs.writeFile).toHaveBeenCalledWith('.github/dependabot.yml', expect.stringContaining('package-ecosystem'))
     expect(fs.writeFile).toHaveBeenCalledWith('.github/release.yml', expect.stringContaining('dependabot'))
+    expect(fs.writeFile).toHaveBeenCalledWith('tool.cfg', expect.stringContaining('Required=314'))
+  })
+
+  it('should write all dot files but the spine dependency', async () => {
+    const patch: InputParameters = {
+      name: 'testPatch',
+      description: 'Test patch description',
+      needsNinja: false,
+    } as InputParameters
+
+    await files.writeDotFiles(patch)
+    expect(writeDotFilesMock).toHaveReturned()
+    expect(fs.writeFile).toHaveBeenCalledTimes(5)
+    expect(fs.writeFile).toHaveBeenCalledWith('.validator.yml', expect.stringContaining('prefix:\nignore-declaration:\nignore-resource:'))
+    expect(fs.writeFile).toHaveBeenCalledWith('.gitignore', expect.stringContaining('*.vdf'))
+    expect(fs.writeFile).toHaveBeenCalledWith('.gitattributes', expect.stringContaining('*.[dD] text working-tree-encoding=CP1252'))
+    expect(fs.writeFile).toHaveBeenCalledWith('.github/dependabot.yml', expect.stringContaining('package-ecosystem'))
+    expect(fs.writeFile).toHaveBeenCalledWith('.github/release.yml', expect.stringContaining('dependabot'))
+    expect(fs.writeFile).not.toHaveBeenCalledWith('tool.cfg', expect.any(String))
   })
 })
 
