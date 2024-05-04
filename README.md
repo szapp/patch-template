@@ -59,3 +59,8 @@ The generated patch repository will be equipped with tests and continuous integr
 ## Documentation
 
 For details on writing patches, please consult the [Ninja documentation](https://github.com/szapp/Ninja/wiki).
+
+## Troubleshooting
+
+In case the initialization does not start automatically after opening an issue in the generated repository, check the repository settings.
+Actions and workflows should not be disabled. After enabling them create a new issue and try again.
