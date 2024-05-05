@@ -164,6 +164,9 @@ VDFName=.\\${patch.name}.vdf
 
 [FILES]
 ; Modular resources
+_work\\Data\\Anims\\*.MDS
+_work\\Data\\Anims\\MDS_Mobsi\\*.MDS
+_work\\Data\\Anims\\MDS_Overlay\\*.MDS
 _work\\Data\\Anims\\_compiled\\*.MAN
 _work\\Data\\Anims\\_compiled\\*.MDH
 _work\\Data\\Anims\\_compiled\\*.MDL
