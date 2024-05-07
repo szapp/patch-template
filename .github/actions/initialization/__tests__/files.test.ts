@@ -715,7 +715,7 @@ Test patch description
 This is a modular modification (a.k.a. patch or add-on) that can be installed and uninstalled at any time and is virtually compatible with any modification.
 It supports <kbd>Gothic 1</kbd>, <kbd>Gothic Sequel</kbd>, <kbd>Gothic II (Classic)</kbd> and <kbd>Gothic II: NotR</kbd>.
 
-###### Generated from [template/repo](https://github.com/template/repo).
+<sup>Generated from [template/repo](https://github.com/template/repo).</sup>
 
 ## Installation
 
@@ -775,7 +775,7 @@ Test patch description
 This is a modular modification (a.k.a. patch or add-on) that can be installed and uninstalled at any time and is virtually compatible with any modification.
 It supports <kbd>Gothic Sequel</kbd> only.
 
-###### Generated from [template/repo](https://github.com/template/repo).
+<sup>Generated from [template/repo](https://github.com/template/repo).</sup>
 
 ## Installation
 

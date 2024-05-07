@@ -390,7 +390,7 @@ ${patch.description}
 This is a modular modification (a.k.a. patch or add-on) that can be installed and uninstalled at any time and is virtually compatible with any modification.
 ${compatible}
 
-###### Generated from [${templateRepo}](${templateRepoUrl}).
+<sup>Generated from [${templateRepo}](${templateRepoUrl}).</sup>
 
 ## Installation
 
