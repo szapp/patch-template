@@ -13,17 +13,16 @@ Let's get started!
 
 ### 1️⃣ Generate a repository [from the template](https://repo.new/?template_name=patch-template&template_owner=szapp)
 
-&nbsp; &nbsp; &nbsp; &nbsp; <sup>Do not fork this repository, but generate from template!</sup>  
-&nbsp; &nbsp; &nbsp; &nbsp;[![Template](.github/actions/initialization/badges/template.png)](https://repo.new/?template_name=patch-template&template_owner=szapp)
+> <sup>Do not fork this repository, but generate from template!</sup>  
+  [![Template](.github/actions/initialization/badges/template.png)](https://repo.new/?template_name=patch-template&template_owner=szapp)
 
 ### 2️⃣ In the new repo, open a [GitHub issue](../../issues/new/choose) to initialize the patch
 
-&nbsp; &nbsp; &nbsp; &nbsp; <sub>The generated repository's name and its description</sub>  
-&nbsp; &nbsp; &nbsp; &nbsp; <sup>will serve as the name and description of the patch.</sup>
+> <sup>The generated repository's name and its description will serve as the name and description of the patch.</sup>
 
 ### 3️⃣ Wait for the initialization to complete
 
-&nbsp; &nbsp; &nbsp; &nbsp; <sup>Follow the next steps in the generated issue comments.</sup>
+> <sup>Follow the next steps in the generated issue comments.</sup>
 
 ## Checks and continuous integration
 
