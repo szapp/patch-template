@@ -233,6 +233,7 @@ describe('parseInputs', () => {
       userEmail: '',
       repo: '',
       url: '',
+      topics: [] as string[],
     }
     const errors: VerboseError[] = []
 
@@ -305,6 +306,7 @@ describe('parseInputs', () => {
       userEmail: '',
       repo: '',
       url: '',
+      topics: [] as string[],
     }
     const errors: VerboseError[] = []
 
@@ -371,6 +373,7 @@ describe('parseInputs', () => {
       userEmail: '',
       repo: '',
       url: '',
+      topics: [] as string[],
     }
     const errors: VerboseError[] = []
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -624,6 +627,7 @@ describe('parseEnv', () => {
       description: 'description',
       repo: 'user/repo',
       url: 'https://github.com/user/repo',
+      topics: [] as string[],
       username: 'john-doe',
       usernameFull: 'John Doe',
       userEmail: '123+john-doe@users.noreply.github.com',
@@ -652,6 +656,7 @@ describe('parseEnv', () => {
               template_repository: {
                 full_name: 'user/templateRepo',
               },
+              topics: ['existing-topic'],
             },
           }),
         },
@@ -674,6 +679,7 @@ describe('parseEnv', () => {
       description: 'description',
       repo: 'user/repo',
       url: 'https://github.com/user/repo',
+      topics: ['existing-topic'],
       username: 'john-doe',
       usernameFull: 'John Doe',
       userEmail: '123+john-doe@users.noreply.github.com',
@@ -719,6 +725,7 @@ describe('parseEnv', () => {
       description: 'description',
       repo: 'user/repo',
       url: 'https://github.com/user/repo',
+      topics: [] as string[],
       username: 'john-doe',
       usernameFull: 'john-doe',
       userEmail: 'john-doe@users.noreply.github.com',

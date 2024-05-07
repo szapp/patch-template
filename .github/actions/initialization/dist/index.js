@@ -34900,6 +34900,7 @@ exports.InputParameters = zod_1.z
         needsVersions: [0],
         name: '',
         description: '',
+        topics: [],
         username: '',
         usernameFull: '',
         userEmail: '',
@@ -35439,6 +35440,79 @@ exports.commit = commit;
 
 /***/ }),
 
+/***/ 978:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.updateTopics = void 0;
+const github = __importStar(__nccwpck_require__(5438));
+const core = __importStar(__nccwpck_require__(2186));
+async function updateTopics(patch) {
+    // Extra topics
+    const versionTopics = [
+        ...new Set(patch.needsVersions.map((version) => {
+            switch (version) {
+                case 112:
+                    version = 1;
+                    break;
+                case 130:
+                    version = 2;
+            }
+            return `gothic${version}`;
+        })),
+    ];
+    const methodsTopics = [patch.needsNinja ? ['ninja'] : [], patch.needsScripts ? ['daedalus'] : []].flat();
+    // Suggested repository keywords for Gothic patches
+    const suggestedTopics = ['gothic', ...versionTopics, 'modding-gothic', ...methodsTopics];
+    // Combine suggested topics with existing topics
+    const allTopics = [...new Set([...suggestedTopics, ...patch.topics])];
+    // Update repository topics if necessary
+    const topicsBefore = [...patch.topics].sort();
+    const topicsAfter = [...allTopics].sort();
+    if (JSON.stringify(topicsBefore) !== JSON.stringify(topicsAfter)) {
+        try {
+            const token = core.getInput('token', { required: true });
+            const octokit = github.getOctokit(token);
+            await octokit.rest.repos.replaceAllTopics({
+                ...github.context.repo,
+                names: allTopics,
+            });
+        }
+        catch (error) {
+            console.warn('Updating repository topics failed: ', error);
+        }
+    }
+}
+exports.updateTopics = updateTopics;
+
+
+/***/ }),
+
 /***/ 9430:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -35576,7 +35650,7 @@ async function parseEnv(templateRepo) {
     const actorId = data?.id ?? '';
     const userEmail = `${actorId ? actorId + '+' : ''}${username}@users.noreply.github.com`;
     // Check if repository is generated template from source
-    const { data: { private: is_private, fork, is_template, template_repository }, } = await octokit.rest.repos.get(github.context.repo);
+    const { data: { private: is_private, fork, is_template, template_repository, topics }, } = await octokit.rest.repos.get(github.context.repo);
     if (fork) {
         // Must not be a fork
         throw new classes_1.VerboseError('Repository must not be a fork', `The repository must not be a fork of the template repository. Please create a new repository, generated from the template ${templateRepo}.`);
@@ -35589,7 +35663,8 @@ async function parseEnv(templateRepo) {
         // Must not be a template
         throw new classes_1.VerboseError('Repository must not be a template', 'The repository must not be a template repository. Please create change the settings of this repository and try again.');
     }
-    return { name: patchName, description, url, repo, username, usernameFull, userEmail };
+    const topicList = typeof topics === 'undefined' ? [] : topics.map((t) => t.toLowerCase());
+    return { name: patchName, description, url, repo, topics: topicList, username, usernameFull, userEmail };
 }
 exports.parseEnv = parseEnv;
 function parsePackage(errors) {
@@ -35672,6 +35747,7 @@ const files = __importStar(__nccwpck_require__(7255));
 const git_1 = __nccwpck_require__(6350);
 const infos_1 = __nccwpck_require__(9430);
 const classes_1 = __nccwpck_require__(4813);
+const github_1 = __nccwpck_require__(978);
 exports.errors = [];
 exports.warnings = [];
 exports.infos = [];
@@ -35722,6 +35798,8 @@ async function run() {
         (0, infos_1.listNextSteps)(patch, exports.infos);
         // Commit changes on new orphan branch
         await (0, git_1.commit)();
+        // Update repository topics if necessary
+        await (0, github_1.updateTopics)(patch);
     }
     catch (error) {
         // Collect all errors

@@ -4,6 +4,7 @@ import * as files from './files'
 import { setupIdentity, commit } from './git'
 import { listNextSteps, header } from './infos'
 import { AggregateError, VerboseError, InputParameters } from './classes'
+import { updateTopics } from './github'
 
 export const errors: VerboseError[] = []
 export const warnings: VerboseError[] = []
@@ -65,6 +66,9 @@ export async function run(): Promise<void> {
 
     // Commit changes on new orphan branch
     await commit()
+
+    // Update repository topics if necessary
+    await updateTopics(patch)
   } catch (error) {
     // Collect all errors
     if (!(error instanceof AggregateError)) {

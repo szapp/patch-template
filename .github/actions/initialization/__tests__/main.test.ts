@@ -4,6 +4,7 @@ import * as inputs from '../src/inputs'
 import * as files from '../src/files'
 import * as infos from '../src/infos'
 import * as git from '../src/git'
+import * as github from '../src/github'
 import { AggregateError, VerboseError, InputParameters } from '../src/classes'
 
 jest.mock('@actions/core')
@@ -28,6 +29,7 @@ describe('run', () => {
       name: 'Test',
       description: 'Test description',
       url: 'https://example.com/user/repo',
+      topics: [] as string[],
       username: 'john-doe',
       usernameFull: 'John Doe',
       userEmail: 'john-doe@example.com',
@@ -75,6 +77,7 @@ describe('run', () => {
     jest.spyOn(infos, 'header').mockReturnValue('')
     jest.spyOn(git, 'setupIdentity').mockResolvedValue()
     jest.spyOn(git, 'commit').mockResolvedValue()
+    jest.spyOn(github, 'updateTopics').mockResolvedValue()
 
     await main.run()
     expect(runMock).toHaveReturned()
@@ -129,6 +132,9 @@ describe('run', () => {
     expect(infos.listNextSteps).toHaveReturned()
     expect(git.commit).toHaveBeenCalledTimes(1)
     expect(git.commit).toHaveReturned()
+    expect(github.updateTopics).toHaveBeenCalledTimes(1)
+    expect(github.updateTopics).toHaveBeenCalledWith(patch)
+    expect(github.updateTopics).toHaveReturned()
     expect(infos.header).toHaveBeenCalledTimes(1)
     expect(infos.header).toHaveReturned()
     expect(core.setOutput).toHaveBeenCalledTimes(4)

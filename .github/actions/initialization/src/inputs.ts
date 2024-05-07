@@ -37,6 +37,7 @@ export async function parseEnv(templateRepo: string): Promise<{
   description: string
   repo: string
   url: string
+  topics: string[]
   username: string
   usernameFull: string
   userEmail: string
@@ -77,7 +78,7 @@ export async function parseEnv(templateRepo: string): Promise<{
 
   // Check if repository is generated template from source
   const {
-    data: { private: is_private, fork, is_template, template_repository },
+    data: { private: is_private, fork, is_template, template_repository, topics },
   } = await octokit.rest.repos.get(github.context.repo)
   if (fork) {
     // Must not be a fork
@@ -101,7 +102,9 @@ export async function parseEnv(templateRepo: string): Promise<{
     )
   }
 
-  return { name: patchName, description, url, repo, username, usernameFull, userEmail }
+  const topicList = typeof topics === 'undefined' ? [] : topics.map((t) => t.toLowerCase())
+
+  return { name: patchName, description, url, repo, topics: topicList, username, usernameFull, userEmail }
 }
 
 export function parsePackage(errors: VerboseError[]): { templateRepo: string; templateRepoUrl: string } {

@@ -106,6 +106,7 @@ export const InputParameters = z
       needsVersions: [0],
       name: '',
       description: '',
+      topics: [] as string[],
       username: '',
       usernameFull: '',
       userEmail: '',
