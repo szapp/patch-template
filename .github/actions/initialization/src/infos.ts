@@ -71,4 +71,37 @@ export function listNextSteps(patch: InputParameters, infos: VerboseError[]): vo
             : '')
     )
   )
+  infos.push(
+    new VerboseError(
+      'Increase Visibility on GitHub',
+      'To make your patch repository easier to find on GitHub, you may want to add the following common keyword topics by editing the repository details. ' +
+        suggestTopics(patch)
+          .map((t) => `<kbd>${t}</kbd>`)
+          .join(' ')
+    )
+  )
+}
+
+export function suggestTopics(patch: InputParameters): string[] {
+  // Extra topics
+  const versionTopics = [
+    ...new Set(
+      patch.needsVersions.map((version) => {
+        switch (version) {
+          case 112:
+            version = 1
+            break
+          case 130:
+            version = 2
+        }
+        return `gothic${version}`
+      })
+    ),
+  ]
+  const methodsTopics = [patch.needsNinja ? ['ninja'] : [], patch.needsScripts ? ['daedalus'] : []].flat()
+
+  // Suggested repository keywords for Gothic patches
+  const suggestedTopics = ['gothic', ...versionTopics, 'modding-gothic', ...methodsTopics]
+
+  return suggestedTopics
 }
