@@ -5,8 +5,11 @@ on:
   push:
     paths:
       - "Ninja/**/*.src"
+      - "Ninja/**/*.SRC"
       - "Ninja/**/*.d"
+      - "Ninja/**/*.D"
       - "_work/Data/**/*"
+  workflow_dispatch:
 
 # These permissions are necessary for creating the check runs
 permissions:

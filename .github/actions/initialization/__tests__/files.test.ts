@@ -740,7 +740,7 @@ The patch is also available on
 <!--
 
 If you are interested in writing your own patch, please do not copy this patch!
-Instead refer to the PATCH TEMPLATE to build a fundation that is customized to your needs!
+Instead refer to the PATCH TEMPLATE to build a foundation that is customized to your needs!
 The patch template can found at ${templateRepoUrl}.
 
 -->
@@ -794,7 +794,7 @@ The patch is also available on
 <!--
 
 If you are interested in writing your own patch, please do not copy this patch!
-Instead refer to the PATCH TEMPLATE to build a fundation that is customized to your needs!
+Instead refer to the PATCH TEMPLATE to build a foundation that is customized to your needs!
 The patch template can found at ${templateRepoUrl}.
 
 -->
