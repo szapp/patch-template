@@ -35645,13 +35645,10 @@ function checkPatchName(name, errors) {
 }
 exports.checkPatchName = checkPatchName;
 function checkPatchDesc(description, errors) {
-    const details = 'The repository description is used as a brief sentence describing the patch. It serves as basic information for players in the ingame console and inside the VDF. Maximum length is 250 characters. Illegal characters: ><|& You may use %%N for line breaks. No more than three lines are supported.';
+    const details = 'The repository description is used as a brief sentence describing the patch. It serves as basic information for players in the ingame console and inside the VDF. Maximum length is 254 characters. You may use %%N for line breaks. No more than three lines are supported.';
     const numNL = (description.match(/%%N/g) || []).length;
     if (description.length - numNL > 254) {
         errors.push(new classes_1.VerboseError('The patch description may not exceed 254 characters', details));
-    }
-    if (!/^[^><|&]*$/.test(description)) {
-        errors.push(new classes_1.VerboseError('The patch description may not contain the characters `><|&`', details));
     }
     if (numNL > 3) {
         errors.push(new classes_1.VerboseError('The patch description may not contain more than 3 line breaks (%%N)', details));
