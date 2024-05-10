@@ -35328,14 +35328,14 @@ async function writeReadme(patch, templateRepo, templateRepoUrl) {
             requirements += '<th>Gothic II: NotR</th>';
         requirements += '</tr></thead>\n<tbody><tr>';
         if (patch.needsVersions.includes(1))
-            requirements += '<td><a href="https://www.worldofgothic.de/dl/download_6.htm">Version 1.08k_mod</a></td>';
+            requirements += '<td><a href="https://www.worldofgothic.de/dl/download_34.htm">Version 1.08k_mod</a></td>';
         if (patch.needsVersions.includes(112))
             requirements += '<td>Version 1.12f</td>';
         if (patch.needsVersions.includes(130))
             requirements += '<td><a href="https://www.worldofgothic.de/dl/download_278.htm">Report version 1.30.0.0</a></td>';
         if (patch.needsVersions.includes(2))
             requirements += '<td><a href="https://www.worldofgothic.de/dl/download_278.htm">Report version 2.6.0.0</a></td>';
-        requirements += `</tr></tbody>\n<tbody><tr><td colspan="${patch.needsVersions.length}" align="center"><a href="https://github.com/szapp/Ninja">Ninja 2</a> (or higher)</td></tr></tbody></table>`;
+        requirements += `</tr></tbody>\n<tbody><tr><td colspan="${patch.needsVersions.length}" align="center"><a href="https://github.com/szapp/Ninja">Ninja 2.8</a> or higher</td></tr></tbody></table>`;
     }
     return promises_1.default.writeFile('README.md', `# ${patch.name}
 ${badge}
