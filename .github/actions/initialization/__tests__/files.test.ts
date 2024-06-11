@@ -686,7 +686,7 @@ describe('writeDotFiles', () => {
 })
 
 describe('writeReadme', () => {
-  it('should write the README file with badge', async () => {
+  it('should write the README file with extra badges', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       needsScripts: true,
@@ -708,14 +708,18 @@ describe('writeReadme', () => {
 [![Scripts](https://github.com/user/repo/actions/workflows/scripts.yml/badge.svg)](https://github.com/user/repo/actions/workflows/scripts.yml)
 [![Validation](https://github.com/user/repo/actions/workflows/validation.yml/badge.svg)](https://github.com/user/repo/actions/workflows/validation.yml)
 [![Build](https://github.com/user/repo/actions/workflows/build.yml/badge.svg)](https://github.com/user/repo/actions/workflows/build.yml)
-[![GitHub release](https://img.shields.io/github/v/release/user/repo.svg)](https://github.com/user/repo/releases/latest)
+[![GitHub release](https://img.shields.io/github/v/release/user/repo.svg)](https://github.com/user/repo/releases/latest)  
+<!-- [![World of Gothic](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/wog.svg)](https://www.worldofgothic.de/dl/download_XXXX.htm) -->
+<!-- [![Spine](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/spine.svg)](https://clockwork-origins.com/spine) -->
+<!-- [![Steam Gothic 1](https://img.shields.io/badge/steam-Gothic%201-2a3f5a?logo=steam&labelColor=1b2838)](https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX) -->
+<!-- [![Steam Gothic 2](https://img.shields.io/badge/steam-Gothic%202-2a3f5a?logo=steam&labelColor=1b2838)](https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX) -->
 
 Test patch description
 
 This is a modular modification (a.k.a. patch or add-on) that can be installed and uninstalled at any time and is virtually compatible with any modification.
 It supports <kbd>Gothic 1</kbd>, <kbd>Gothic Sequel</kbd>, <kbd>Gothic II (Classic)</kbd> and <kbd>Gothic II: NotR</kbd>.
 
-<sup>Generated from [template/repo](https://github.com/template/repo).</sup>
+<sup>Generated from [${templateRepo}](${templateRepoUrl}).</sup>
 
 ## Installation
 
@@ -748,7 +752,7 @@ The patch template can found at ${templateRepoUrl}.
     )
   })
 
-  it('should write the README file without badge', async () => {
+  it('should write the README file without extra badges', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       needsScripts: false,
@@ -768,14 +772,16 @@ The patch template can found at ${templateRepoUrl}.
       `# testPatch
 
 [![Build](https://github.com/user/repo/actions/workflows/build.yml/badge.svg)](https://github.com/user/repo/actions/workflows/build.yml)
-[![GitHub release](https://img.shields.io/github/v/release/user/repo.svg)](https://github.com/user/repo/releases/latest)
+[![GitHub release](https://img.shields.io/github/v/release/user/repo.svg)](https://github.com/user/repo/releases/latest)  
+<!-- [![World of Gothic](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/wog.svg)](https://www.worldofgothic.de/dl/download_XXXX.htm) -->
+<!-- [![Spine](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/spine.svg)](https://clockwork-origins.com/spine) -->
 
 Test patch description
 
 This is a modular modification (a.k.a. patch or add-on) that can be installed and uninstalled at any time and is virtually compatible with any modification.
 It supports <kbd>Gothic Sequel</kbd> only.
 
-<sup>Generated from [template/repo](https://github.com/template/repo).</sup>
+<sup>Generated from [${templateRepo}](${templateRepoUrl}).</sup>
 
 ## Installation
 
@@ -790,6 +796,70 @@ The patch is also available on
 -->
 
 
+
+<!--
+
+If you are interested in writing your own patch, please do not copy this patch!
+Instead refer to the PATCH TEMPLATE to build a foundation that is customized to your needs!
+The patch template can found at ${templateRepoUrl}.
+
+-->
+`
+    )
+  })
+
+  it('should write the README file with a single steam badge', async () => {
+    const patch: InputParameters = {
+      name: 'testPatch',
+      needsScripts: true,
+      needsNinja: true,
+      needsVersions: [1],
+      repo: 'user/repo',
+      url: 'https://github.com/user/repo',
+      description: 'Test patch description',
+    } as InputParameters
+    const templateRepo = 'template/repo'
+    const templateRepoUrl = 'https://github.com/template/repo'
+
+    await files.writeReadme(patch, templateRepo, templateRepoUrl)
+    expect(writeReadmeMock).toHaveReturned()
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      'README.md',
+      `# testPatch
+
+[![Scripts](https://github.com/user/repo/actions/workflows/scripts.yml/badge.svg)](https://github.com/user/repo/actions/workflows/scripts.yml)
+[![Validation](https://github.com/user/repo/actions/workflows/validation.yml/badge.svg)](https://github.com/user/repo/actions/workflows/validation.yml)
+[![Build](https://github.com/user/repo/actions/workflows/build.yml/badge.svg)](https://github.com/user/repo/actions/workflows/build.yml)
+[![GitHub release](https://img.shields.io/github/v/release/user/repo.svg)](https://github.com/user/repo/releases/latest)  
+<!-- [![World of Gothic](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/wog.svg)](https://www.worldofgothic.de/dl/download_XXXX.htm) -->
+<!-- [![Spine](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/spine.svg)](https://clockwork-origins.com/spine) -->
+<!-- [![Steam workshop](https://img.shields.io/badge/steam-workshop-2a3f5a?logo=steam&labelColor=1b2838)](https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX) -->
+
+Test patch description
+
+This is a modular modification (a.k.a. patch or add-on) that can be installed and uninstalled at any time and is virtually compatible with any modification.
+It supports <kbd>Gothic 1</kbd> only.
+
+<sup>Generated from [${templateRepo}](${templateRepoUrl}).</sup>
+
+## Installation
+
+1. Download the latest release of \`testPatch.vdf\` from the [releases page](https://github.com/user/repo/releases/latest).
+
+2. Copy the file \`testPatch.vdf\` to \`[Gothic]\\Data\\\`. To uninstall, remove the file again.
+
+<!--
+The patch is also available on
+- [World of Gothic](https://www.worldofgothic.de/dl/download_XXXX.htm) | [Forum thread](https://forum.worldofplayers.de/forum/threads/XXXXXXX)
+- [Spine Mod-Manager](https://clockwork-origins.com/spine/)
+- [Steam Workshop Gothic 1](https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX)
+-->
+
+### Requirements
+
+<table><thead><tr><th>Gothic</th></tr></thead>
+<tbody><tr><td><a href="https://www.worldofgothic.de/dl/download_34.htm">Version 1.08k_mod</a></td></tr></tbody>
+<tbody><tr><td colspan="1" align="center"><a href="https://github.com/szapp/Ninja">Ninja 2.8</a> or higher</td></tr></tbody></table>
 
 <!--
 
