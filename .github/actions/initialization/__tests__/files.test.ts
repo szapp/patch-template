@@ -709,8 +709,8 @@ describe('writeReadme', () => {
 [![Validation](https://github.com/user/repo/actions/workflows/validation.yml/badge.svg)](https://github.com/user/repo/actions/workflows/validation.yml)
 [![Build](https://github.com/user/repo/actions/workflows/build.yml/badge.svg)](https://github.com/user/repo/actions/workflows/build.yml)
 [![GitHub release](https://img.shields.io/github/v/release/user/repo.svg)](https://github.com/user/repo/releases/latest)  
-<!-- [![World of Gothic](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/wog.svg)](https://www.worldofgothic.de/dl/download_XXXX.htm) -->
-<!-- [![Spine](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/spine.svg)](https://clockwork-origins.com/spine) -->
+<!-- [![World of Gothic](https://raw.githubusercontent.com/${templateRepo}/main/.github/actions/initialization/badges/wog.svg)](https://www.worldofgothic.de/dl/download_XXXX.htm) -->
+<!-- [![Spine](https://raw.githubusercontent.com/${templateRepo}/main/.github/actions/initialization/badges/spine.svg)](https://clockwork-origins.com/spine) -->
 <!-- [![Steam Gothic 1](https://img.shields.io/badge/steam-Gothic%201-2a3f5a?logo=steam&labelColor=1b2838)](https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX) -->
 <!-- [![Steam Gothic 2](https://img.shields.io/badge/steam-Gothic%202-2a3f5a?logo=steam&labelColor=1b2838)](https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX) -->
 
@@ -739,7 +739,7 @@ The patch is also available on
 
 <table><thead><tr><th>Gothic</th><th>Gothic Sequel</th><th>Gothic II (Classic)</th><th>Gothic II: NotR</th></tr></thead>
 <tbody><tr><td><a href="https://www.worldofgothic.de/dl/download_34.htm">Version 1.08k_mod</a></td><td>Version 1.12f</td><td><a href="https://www.worldofgothic.de/dl/download_278.htm">Report version 1.30.0.0</a></td><td><a href="https://www.worldofgothic.de/dl/download_278.htm">Report version 2.6.0.0</a></td></tr></tbody>
-<tbody><tr><td colspan="4" align="center"><a href="https://github.com/szapp/Ninja">Ninja 2.8</a> or higher</td></tr></tbody></table>
+<tbody><tr><td colspan="4" align="center"><a href="https://github.com/szapp/Ninja">Ninja 2.9.15</a> or higher</td></tr></tbody></table>
 
 <!--
 
@@ -773,8 +773,8 @@ The patch template can found at ${templateRepoUrl}.
 
 [![Build](https://github.com/user/repo/actions/workflows/build.yml/badge.svg)](https://github.com/user/repo/actions/workflows/build.yml)
 [![GitHub release](https://img.shields.io/github/v/release/user/repo.svg)](https://github.com/user/repo/releases/latest)  
-<!-- [![World of Gothic](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/wog.svg)](https://www.worldofgothic.de/dl/download_XXXX.htm) -->
-<!-- [![Spine](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/spine.svg)](https://clockwork-origins.com/spine) -->
+<!-- [![World of Gothic](https://raw.githubusercontent.com/${templateRepo}/main/.github/actions/initialization/badges/wog.svg)](https://www.worldofgothic.de/dl/download_XXXX.htm) -->
+<!-- [![Spine](https://raw.githubusercontent.com/${templateRepo}/main/.github/actions/initialization/badges/spine.svg)](https://clockwork-origins.com/spine) -->
 
 Test patch description
 
@@ -831,8 +831,8 @@ The patch template can found at ${templateRepoUrl}.
 [![Validation](https://github.com/user/repo/actions/workflows/validation.yml/badge.svg)](https://github.com/user/repo/actions/workflows/validation.yml)
 [![Build](https://github.com/user/repo/actions/workflows/build.yml/badge.svg)](https://github.com/user/repo/actions/workflows/build.yml)
 [![GitHub release](https://img.shields.io/github/v/release/user/repo.svg)](https://github.com/user/repo/releases/latest)  
-<!-- [![World of Gothic](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/wog.svg)](https://www.worldofgothic.de/dl/download_XXXX.htm) -->
-<!-- [![Spine](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/spine.svg)](https://clockwork-origins.com/spine) -->
+<!-- [![World of Gothic](https://raw.githubusercontent.com/${templateRepo}/main/.github/actions/initialization/badges/wog.svg)](https://www.worldofgothic.de/dl/download_XXXX.htm) -->
+<!-- [![Spine](https://raw.githubusercontent.com/${templateRepo}/main/.github/actions/initialization/badges/spine.svg)](https://clockwork-origins.com/spine) -->
 <!-- [![Steam workshop](https://img.shields.io/badge/steam-workshop-2a3f5a?logo=steam&labelColor=1b2838)](https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX) -->
 
 Test patch description
@@ -859,7 +859,7 @@ The patch is also available on
 
 <table><thead><tr><th>Gothic</th></tr></thead>
 <tbody><tr><td><a href="https://www.worldofgothic.de/dl/download_34.htm">Version 1.08k_mod</a></td></tr></tbody>
-<tbody><tr><td colspan="1" align="center"><a href="https://github.com/szapp/Ninja">Ninja 2.8</a> or higher</td></tr></tbody></table>
+<tbody><tr><td colspan="1" align="center"><a href="https://github.com/szapp/Ninja">Ninja 2.9.15</a> or higher</td></tr></tbody></table>
 
 <!--
 

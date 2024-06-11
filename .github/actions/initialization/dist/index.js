@@ -35289,8 +35289,8 @@ async function writeReadme(patch, templateRepo, templateRepoUrl) {
         : '';
     badge += `\n[![Build](${patch.url}/actions/workflows/build.yml/badge.svg)](${patch.url}/actions/workflows/build.yml)`;
     badge += `\n[![GitHub release](https://img.shields.io/github/v/release/${patch.repo}.svg)](${patch.url}/releases/latest)  `;
-    badge += `\n<!-- [![World of Gothic](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/wog.svg)](https://www.worldofgothic.de/dl/download_XXXX.htm) -->`;
-    badge += `\n<!-- [![Spine](${templateRepoUrl}/raw/main/.github/actions/initialization/badges/spine.svg)](https://clockwork-origins.com/spine) -->`;
+    badge += `\n<!-- [![World of Gothic](https://raw.githubusercontent.com/${templateRepo}/main/.github/actions/initialization/badges/wog.svg)](https://www.worldofgothic.de/dl/download_XXXX.htm) -->`;
+    badge += `\n<!-- [![Spine](https://raw.githubusercontent.com/${templateRepo}/main/.github/actions/initialization/badges/spine.svg)](https://clockwork-origins.com/spine) -->`;
     if (patch.needsVersions.includes(1) && patch.needsVersions.includes(2)) {
         badge +=
             '\n<!-- [![Steam Gothic 1](https://img.shields.io/badge/steam-Gothic%201-2a3f5a?logo=steam&labelColor=1b2838)](https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX) -->';
@@ -35347,7 +35347,7 @@ async function writeReadme(patch, templateRepo, templateRepoUrl) {
             requirements += '<td><a href="https://www.worldofgothic.de/dl/download_278.htm">Report version 1.30.0.0</a></td>';
         if (patch.needsVersions.includes(2))
             requirements += '<td><a href="https://www.worldofgothic.de/dl/download_278.htm">Report version 2.6.0.0</a></td>';
-        requirements += `</tr></tbody>\n<tbody><tr><td colspan="${patch.needsVersions.length}" align="center"><a href="https://github.com/szapp/Ninja">Ninja 2.8</a> or higher</td></tr></tbody></table>`;
+        requirements += `</tr></tbody>\n<tbody><tr><td colspan="${patch.needsVersions.length}" align="center"><a href="https://github.com/szapp/Ninja">Ninja 2.9.15</a> or higher</td></tr></tbody></table>`;
     }
     return promises_1.default.writeFile('README.md', `# ${patch.name}
 ${badge}
