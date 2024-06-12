@@ -69,7 +69,7 @@ describe('listNextSteps', () => {
 
     infos.listNextSteps(patch, infosArr)
 
-    expect(infosArr).toHaveLength(5)
+    expect(infosArr).toHaveLength(6)
     expect(infosArr[0].message).toBe(infoAlways[0].message)
     expect(infosArr[1].message).toBe(infoAlways[1].message)
     expect(infosArr[1].details).toBe(infoAlways[1].details)
@@ -78,8 +78,12 @@ describe('listNextSteps', () => {
     expect(infosArr[3].details).toBe(
       'Throughly test your patch in Gothic with different mods. It is important to try various mods that <i>do not</i> use Ikarus!'
     )
-    expect(infosArr[4].message).toBe('Increase Visibility on GitHub')
+    expect(infosArr[4].message).toBe('Setup auto-deployment on Steam Workshop (optional)')
     expect(infosArr[4].details).toBe(
+      'If you release your patch on the Steam Workshop for Gothic 1, you can enable auto-deployment of new versions by following the steps in `.github/workflows/build.yml`.'
+    )
+    expect(infosArr[5].message).toBe('Increase Visibility on GitHub')
+    expect(infosArr[5].details).toBe(
       'To make your patch repository easier to find on GitHub, you may want to add the following common keyword topics by editing the repository details. <kbd>gothic</kbd> <kbd>gothic1</kbd> <kbd>modding-gothic</kbd>'
     )
   })
@@ -87,7 +91,7 @@ describe('listNextSteps', () => {
   it('should add only basic infos without ikarus and lego', () => {
     const patch: InputParameters = {
       name: 'Test-patch',
-      needsVersions: [1],
+      needsVersions: [1, 2],
       needsScripts: false,
       needsNinja: false,
       ou: [] as number[],
@@ -99,16 +103,20 @@ describe('listNextSteps', () => {
 
     infos.listNextSteps(patch, infosArr)
 
-    expect(infosArr).toHaveLength(5)
+    expect(infosArr).toHaveLength(6)
     expect(infosArr[0].message).toBe(infoAlways[0].message)
     expect(infosArr[1].message).toBe(infoAlways[1].message)
     expect(infosArr[1].details).toBe(infoAlways[1].details)
     expect(infosArr[2].message).toBe(infoAlways[2].message)
     expect(infosArr[3].message).toBe('Test the Patch')
     expect(infosArr[3].details).toBe('Throughly test your patch in Gothic with different mods.')
-    expect(infosArr[4].message).toBe('Increase Visibility on GitHub')
+    expect(infosArr[4].message).toBe('Setup auto-deployment on Steam Workshop (optional)')
     expect(infosArr[4].details).toBe(
-      'To make your patch repository easier to find on GitHub, you may want to add the following common keyword topics by editing the repository details. <kbd>gothic</kbd> <kbd>gothic1</kbd> <kbd>modding-gothic</kbd>'
+      'If you release your patch on the Steam Workshop for Gothic 1 and/or Gothic 2, you can enable auto-deployment of new versions by following the steps in `.github/workflows/build.yml`.'
+    )
+    expect(infosArr[5].message).toBe('Increase Visibility on GitHub')
+    expect(infosArr[5].details).toBe(
+      'To make your patch repository easier to find on GitHub, you may want to add the following common keyword topics by editing the repository details. <kbd>gothic</kbd> <kbd>gothic1</kbd> <kbd>gothic2</kbd> <kbd>modding-gothic</kbd>'
     )
   })
 })

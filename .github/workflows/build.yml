@@ -8,6 +8,14 @@ on:
     types: [published]
   workflow_dispatch:
 
+# To auto-deploy to the Steam workshop on new tag/release
+#  (1) the patch must already exist on the Steam workshop
+#  (2) the workshop item IDs must be added below (one or both)
+# Leaving the variables empty, will skip the deployment steps
+env:
+  STEAM_WORKSHOP_G1:
+  STEAM_WORKSHOP_G2:
+
 permissions:
   contents: write
 
@@ -33,17 +41,51 @@ jobs:
         with:
           in: ${{ env.PATCH_NAME }}.vm
 
-      - name: Create release with assests (if tag pushed)
+      - name: Create release with assets (if tag pushed)
         if: startsWith(github.ref, 'refs/tags/') && github.event_name != 'release'
         run: gh release create ${{ env.VERSION }} --generate-notes "${{ env.PATCH_NAME }}.vdf" || exit 0
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Upload release assests (if release published)
+      - name: Upload release assets (if release published)
         if: github.event_name == 'release'
         run: gh release upload ${{ env.VERSION }} "${{ env.PATCH_NAME }}.vdf" || exit 0
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Prepare Steam workshop upload
+        if: (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release') && (env.STEAM_WORKSHOP_G1 != '' || env.STEAM_WORKSHOP_G2 != '')
+        run: |
+          mkdir -p content/Data
+          cp *.vdf content/Data/
+
+      - name: Update in Gothic 1 Steam workshop
+        if: (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release') && env.STEAM_WORKSHOP_G1 != ''
+        uses: m00nl1ght-dev/steam-workshop-deploy@v2
+        with:
+          username: ${{ secrets.STEAM_USERNAME }}
+          configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
+          path: content
+          appId: 65540
+          publishedFileId: ${{ env.STEAM_WORKSHOP_G1 }}
+          changeNote: |
+            Version ${{ env.VERSION }}
+
+            Release notes: https://github.com/${{ github.repository }}/releases/tag/${{ env.VERSION }}
+
+      - name: Update in Gothic 2 Steam workshop
+        if: (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release') && env.STEAM_WORKSHOP_G2 != ''
+        uses: m00nl1ght-dev/steam-workshop-deploy@v2
+        with:
+          username: ${{ secrets.STEAM_USERNAME }}
+          configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
+          path: content
+          appId: 39510
+          publishedFileId: ${{ env.STEAM_WORKSHOP_G2 }}
+          changeNote: |
+            Version ${{ env.VERSION }}
+
+            Release notes: https://github.com/${{ github.repository }}/releases/tag/${{ env.VERSION }}
 
       - name: Upload artifacts
         if: github.event_name == 'workflow_dispatch'

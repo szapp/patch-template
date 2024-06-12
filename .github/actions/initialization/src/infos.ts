@@ -71,6 +71,18 @@ export function listNextSteps(patch: InputParameters, infos: VerboseError[]): vo
             : '')
     )
   )
+  if (patch.needsVersions.includes(1) || patch.needsVersions.includes(2)) {
+    const steamVersions = patch.needsVersions
+      .filter((v) => [1, 2].includes(v))
+      .map((v) => (v === 1 ? 'Gothic 1' : 'Gothic 2'))
+      .join(' and/or ')
+    infos.push(
+      new VerboseError(
+        'Setup auto-deployment on Steam Workshop (optional)',
+        `If you release your patch on the Steam Workshop for ${steamVersions}, you can enable auto-deployment of new versions by following the steps in \`.github/workflows/build.yml\`.`
+      )
+    )
+  }
   infos.push(
     new VerboseError(
       'Increase Visibility on GitHub',

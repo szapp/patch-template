@@ -35496,6 +35496,13 @@ function listNextSteps(patch, infos) {
             : patch.ikarus
                 ? ' It is important to try various mods that <i>do not</i> use Ikarus!'
                 : '')));
+    if (patch.needsVersions.includes(1) || patch.needsVersions.includes(2)) {
+        const steamVersions = patch.needsVersions
+            .filter((v) => [1, 2].includes(v))
+            .map((v) => (v === 1 ? 'Gothic 1' : 'Gothic 2'))
+            .join(' and/or ');
+        infos.push(new classes_1.VerboseError('Setup auto-deployment on Steam Workshop (optional)', `If you release your patch on the Steam Workshop for ${steamVersions}, you can enable auto-deployment of new versions by following the steps in \`.github/workflows/build.yml\`.`));
+    }
     infos.push(new classes_1.VerboseError('Increase Visibility on GitHub', 'To make your patch repository easier to find on GitHub, you may want to add the following common keyword topics by editing the repository details. ' +
         suggestTopics(patch)
             .map((t) => `<kbd>${t}</kbd>`)
