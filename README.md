@@ -52,6 +52,11 @@ The generated patch repository will be equipped with tests and continuous integr
   </tr>
 </tbody></table>
 
+Creating a new tag or publishing a new release will trigger the `build` action that will create a VDF and attach it to the published release.
+If Steam Workshop deployment is set up in the `build` action (`.github/workflows/build.yml`), the new version will be automatically published to the Steam Workshop.
+
+The `build` action can also be triggered manually from the Actions menu and will provide the VDF as artifact of the latest commit to download.
+
 ## Documentation
 
 For details on writing patches, please consult the [Ninja documentation](https://github.com/szapp/Ninja/wiki).
