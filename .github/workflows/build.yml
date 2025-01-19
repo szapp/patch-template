@@ -64,7 +64,7 @@ jobs:
 
       - name: Update in Gothic 1 Steam workshop
         if: (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release') && env.STEAM_WORKSHOP_G1 != ''
-        uses: m00nl1ght-dev/steam-workshop-deploy@v2
+        uses: m00nl1ght-dev/steam-workshop-deploy@v3
         with:
           username: ${{ secrets.STEAM_USERNAME }}
           configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
@@ -78,7 +78,7 @@ jobs:
 
       - name: Update in Gothic 2 Steam workshop
         if: (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release') && env.STEAM_WORKSHOP_G2 != ''
-        uses: m00nl1ght-dev/steam-workshop-deploy@v2
+        uses: m00nl1ght-dev/steam-workshop-deploy@v3
         with:
           username: ${{ secrets.STEAM_USERNAME }}
           configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
