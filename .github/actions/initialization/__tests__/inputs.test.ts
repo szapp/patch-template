@@ -415,7 +415,6 @@ describe('parseEnv', () => {
       payload: {
         repository: {
           name: 'repo',
-          description: 'description',
           html_url: 'https://github.com/user/repo',
         },
       },
@@ -899,6 +898,16 @@ describe('checkPatchDesc', () => {
     inputs.checkPatchDesc(description, errors)
     expect(checkPatchDescMock).toHaveReturned()
     expect(errors.length).toBe(0)
+  })
+
+  it('adds error for empty patch description', () => {
+    const description = ''
+    const errors: VerboseError[] = []
+
+    inputs.checkPatchDesc(description, errors)
+    expect(checkPatchDescMock).toHaveReturned()
+    expect(errors.length).toBe(1)
+    expect(errors[0].message).toBe('The patch description may not be empty')
   })
 
   it('adds error for patch description that is too long', () => {
