@@ -47,7 +47,8 @@ export async function parseEnv(templateRepo: string): Promise<{
       'Repository context not available',
       'Basic information about the repository could not be accessed. Please try again later'
     )
-  const { name: patchName, description, html_url: url } = github.context.payload.repository
+  const { name: patchName, html_url: url } = github.context.payload.repository
+  const description = github.context.payload.repository.description ?? ''
   const repo = (url as string)
     .replace(/^git\+/, '')
     .replace(/\.git$/, '')

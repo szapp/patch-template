@@ -35251,6 +35251,8 @@ updates:
   directory: "/"
   schedule:
     interval: "weekly"
+  ignore:
+    - dependency-name: "kirides/vdfsbuilder" # Using commit-hash is not supported
 `;
     // Relase notes configuration files
     const contentReleaseYml = `# This file excludes bot authors from the automatically generated release notes
@@ -35598,7 +35600,8 @@ exports.parseInputs = parseInputs;
 async function parseEnv(templateRepo) {
     if (typeof github?.context?.payload?.repository === 'undefined')
         throw new classes_1.VerboseError('Repository context not available', 'Basic information about the repository could not be accessed. Please try again later');
-    const { name: patchName, description, html_url: url } = github.context.payload.repository;
+    const { name: patchName, html_url: url } = github.context.payload.repository;
+    const description = github.context.payload.repository.description ?? '';
     const repo = url
         .replace(/^git\+/, '')
         .replace(/\.git$/, '')
