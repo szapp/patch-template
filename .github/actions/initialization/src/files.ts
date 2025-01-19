@@ -294,6 +294,8 @@ updates:
   directory: "/"
   schedule:
     interval: "weekly"
+  ignore:
+    - dependency-name: "kirides/vdfsbuilder" # Using commit-hash is not supported
 `
 
   // Relase notes configuration files
