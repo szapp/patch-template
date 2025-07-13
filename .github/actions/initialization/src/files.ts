@@ -310,11 +310,14 @@ changelog:
 `
 
   // Spine dependencies
-  const contentToolCfg = `; This file adds dependencies for Spine
+  const contentToolCfg =
+    `; This file adds dependencies for Spine
 ; For more information, visit https://clockwork-origins.com/spine-tutorial-tool-cfg/
 
 [DEPENDENCIES]
-Required=314
+Required=314` +
+    (patch.ikarus ? ',613' : '') +
+    `
 `
 
   return Promise.all([

@@ -30421,7 +30421,9 @@ changelog:
 ; For more information, visit https://clockwork-origins.com/spine-tutorial-tool-cfg/
 
 [DEPENDENCIES]
-Required=314
+Required=314` +
+        (patch.ikarus ? ',613' : '') +
+        `
 `;
     return Promise.all([
         promises_1.default.writeFile('.validator.yml', contentValidatorYml),
