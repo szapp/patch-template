@@ -390,7 +390,10 @@ export async function writeReadme(patch: InputParameters, templateRepo: string, 
       requirements += '<td><a href="https://www.worldofgothic.de/dl/download_278.htm">Report version 1.30.0.0</a></td>'
     if (patch.needsVersions.includes(2))
       requirements += '<td><a href="https://www.worldofgothic.de/dl/download_278.htm">Report version 2.6.0.0</a></td>'
-    requirements += `</tr></tbody>\n<tbody><tr><td colspan="${patch.needsVersions.length}" align="center"><a href="https://github.com/szapp/Ninja">Ninja 3</a> or higher</td></tr></tbody></table>`
+    requirements += `</tr></tbody>\n<tbody><tr><td colspan="${patch.needsVersions.length}" align="center"><a href="https://github.com/szapp/Ninja">Ninja 4</a> or higher</td></tr></tbody>\n`
+    if (patch.ikarus)
+      requirements += `<tbody><tr><td colspan="${patch.needsVersions.length}" align="center"><a href="https://github.com/szapp/Toolkit">Toolkit 16</a> or higher</td></tr></tbody>\n`
+    requirements += '</table>'
   }
 
   return fs.writeFile(
