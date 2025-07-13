@@ -663,7 +663,7 @@ describe('writeDotFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledWith('.gitattributes', expect.stringContaining('*.[dD] text working-tree-encoding=CP1252'))
     expect(fs.writeFile).toHaveBeenCalledWith('.github/dependabot.yml', expect.stringContaining('package-ecosystem'))
     expect(fs.writeFile).toHaveBeenCalledWith('.github/release.yml', expect.stringContaining('dependabot'))
-    expect(fs.writeFile).toHaveBeenCalledWith('tool.cfg', expect.stringContaining('Required=314\n'))
+    expect(fs.writeFile).toHaveBeenCalledWith('tool.cfg', expect.stringContaining('Required="314"'))
   })
 
   it('should write all dot files including toolkit spine dependency', async () => {
@@ -682,7 +682,7 @@ describe('writeDotFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledWith('.gitattributes', expect.stringContaining('*.[dD] text working-tree-encoding=CP1252'))
     expect(fs.writeFile).toHaveBeenCalledWith('.github/dependabot.yml', expect.stringContaining('package-ecosystem'))
     expect(fs.writeFile).toHaveBeenCalledWith('.github/release.yml', expect.stringContaining('dependabot'))
-    expect(fs.writeFile).toHaveBeenCalledWith('tool.cfg', expect.stringContaining('Required=314,613\n'))
+    expect(fs.writeFile).toHaveBeenCalledWith('tool.cfg', expect.stringContaining('Required="314,613"'))
   })
 
   it('should write all dot files but the spine dependency', async () => {
