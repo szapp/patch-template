@@ -31,7 +31,7 @@ jobs:
         with:
           issue_number: ${{ github.event.issue.number }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Verify and run file operations
         id: process

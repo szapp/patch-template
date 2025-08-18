@@ -37,7 +37,7 @@ jobs:
         run: echo "VERSION=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Build VDF
         uses: kirides/vdfsbuilder@aaf901f0c98245af54102a1946d8be0e2e17ba36
@@ -64,7 +64,7 @@ jobs:
 
       - name: Update in Gothic 1 Steam workshop
         if: (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release') && env.STEAM_WORKSHOP_G1 != ''
-        uses: m00nl1ght-dev/steam-workshop-deploy@v3
+        uses: m00nl1ght-dev/steam-workshop-deploy@v4
         with:
           username: ${{ secrets.STEAM_USERNAME }}
           configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
@@ -78,7 +78,7 @@ jobs:
 
       - name: Update in Gothic 2 Steam workshop
         if: (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release') && env.STEAM_WORKSHOP_G2 != ''
-        uses: m00nl1ght-dev/steam-workshop-deploy@v3
+        uses: m00nl1ght-dev/steam-workshop-deploy@v4
         with:
           username: ${{ secrets.STEAM_USERNAME }}
           configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
