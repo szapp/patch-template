@@ -13,7 +13,7 @@ export function parseInputs(inputs: string, errors: VerboseError[]): { userinput
   let json: JSON
   try {
     json = JSON.parse(inputs)
-  } catch (error) {
+  } catch {
     throw new VerboseError(
       'Invalid input parameters',
       'The input parameters could not be parsed as JSON. This should not have happened. Please try again. If the error persists, please report it.'
@@ -63,7 +63,7 @@ export async function parseEnv(templateRepo: string): Promise<{
   try {
     const token = core.getInput('token', { required: true })
     octokit = github.getOctokit(token)
-  } catch (error) {
+  } catch {
     throw new VerboseError(
       'GitHub API token not available',
       'The GitHub API token is required to access the repository information. Please try again later'
@@ -115,7 +115,7 @@ export function parsePackage(errors: VerboseError[]): { templateRepo: string; te
     const metadata = JSON.parse(fs.readFileSync('.github/actions/initialization/package.json', 'utf8'))
     templateRepoUrl = (metadata.repository.url as string).replace(/^git\+/, '').replace(/\.git$/, '')
     templateRepo = /(?<=\/)[^/]+\/[^/]+$/.exec(templateRepoUrl)?.[0] ?? 'Template repository'
-  } catch (error) {
+  } catch {
     errors.push(
       new VerboseError(
         'Missing package metadata',
