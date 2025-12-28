@@ -6,6 +6,7 @@ on:
     paths:
       - "Ninja/**/*.src"
       - "Ninja/**/*.SRC"
+      - "Ninja/**/*.Src"
       - "Ninja/**/*.d"
       - "Ninja/**/*.D"
   workflow_dispatch:
