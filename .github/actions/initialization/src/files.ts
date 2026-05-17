@@ -1,8 +1,8 @@
-import { InputParameters } from './classes'
-import path from 'path'
-import * as io from '@actions/io'
+import fs from 'node:fs/promises'
+import path from 'node:path'
 import * as exec from '@actions/exec'
-import fs from 'fs/promises'
+import * as io from '@actions/io'
+import type { InputParameters } from './classes.js'
 
 export async function createDirs(patch: InputParameters): Promise<void> {
   // Always create resource directories
@@ -16,7 +16,11 @@ export async function createDirs(patch: InputParameters): Promise<void> {
     ['Worlds'],
   ]
   await Promise.all(
-    rscDirs.map((dir) => exec.exec('install', ['-Dv', '/dev/null', path.join('_work', 'Data', ...dir, '.empty')], { silent: true }))
+    rscDirs.map((dir) =>
+      exec.exec('install', ['-Dv', '/dev/null', path.join('_work', 'Data', ...dir, '.empty')], {
+        silent: true,
+      }),
+    ),
   )
   // Create Ninja directory, Content directory, or empty file as needed
   if (patch.needsInit) await io.mkdirP(path.join('Ninja', patch.name, 'Content'))
@@ -40,7 +44,7 @@ export async function writeContentSrcFiles(patch: InputParameters): Promise<void
         if (patch.needsInit) content += '\n\nContent\\init.d'
         content += '\n' // Trailing newline is important for parsing
         return fs.writeFile(path.join('Ninja', patch.name, `Content_G${version}.src`), content, 'ascii')
-      })
+      }),
     )
   }
 }
@@ -86,19 +90,19 @@ export async function writeSrcFiles(patch: InputParameters): Promise<void> {
     const relScripts: (keyof typeof patch)[] = ['menu', 'pfx', 'vfx', 'sfx', 'music', 'fight', 'camera']
     await Promise.all(
       relScripts.map((name) => {
-        const prefix = name[0].toUpperCase() + name.slice(1)
+        const prefix = name[0]?.toUpperCase() + name.slice(1)
         if (JSON.stringify(patch[name]) === JSON.stringify([1, 112, 130, 2]))
           return fs.writeFile(path.join('Ninja', patch.name, `${prefix}.src`), '\n')
         else
           return Promise.all(
-            (patch[name] as number[]).map((suffix) => fs.writeFile(path.join('Ninja', patch.name, `${prefix}_G${suffix}.src`), '\n'))
+            (patch[name] as number[]).map((suffix) => fs.writeFile(path.join('Ninja', patch.name, `${prefix}_G${suffix}.src`), '\n')),
           )
-      })
+      }),
     )
   }
 }
 
-export async function writeOuFiles(patch: InputParameters): Promise<void | void[]> {
+export async function writeOuFiles(patch: InputParameters): Promise<undefined | undefined[]> {
   // Content of the files
   const content = `ZenGin Archive
 ver 1
@@ -129,11 +133,14 @@ END
 `
   // Write output unit files for each version or one file if all versions are needed
   if (JSON.stringify(patch.ou) === JSON.stringify([1, 112, 130, 2]))
-    return await fs.writeFile(path.join('Ninja', patch.name, 'OU.csl'), content)
-  else return Promise.all(patch.ou.map((version) => fs.writeFile(path.join('Ninja', patch.name, `OU_G${version}.csl`), content)))
+    return (await fs.writeFile(path.join('Ninja', patch.name, 'OU.csl'), content)) as undefined
+  else
+    return Promise.all(patch.ou.map((version) => fs.writeFile(path.join('Ninja', patch.name, `OU_G${version}.csl`), content))) as Promise<
+      undefined[]
+    >
 }
 
-export async function writeAnimFiles(patch: InputParameters): Promise<void | void[]> {
+export async function writeAnimFiles(patch: InputParameters): Promise<undefined | undefined[]> {
   // Content of the files
   const content = `Model ("HuS")
 {
@@ -151,9 +158,11 @@ export async function writeAnimFiles(patch: InputParameters): Promise<void | voi
 
   // Write animation files for each version or one file if all versions are needed
   if (JSON.stringify(patch.anim) === JSON.stringify([1, 112, 130, 2]))
-    return await fs.writeFile(path.join('Ninja', patch.name, 'Anims_Humans.mds'), content)
+    return (await fs.writeFile(path.join('Ninja', patch.name, 'Anims_Humans.mds'), content)) as undefined
   else
-    return Promise.all(patch.anim.map((version) => fs.writeFile(path.join('Ninja', patch.name, `Anims_Humans_G${version}.mds`), content)))
+    return Promise.all(
+      patch.anim.map((version) => fs.writeFile(path.join('Ninja', patch.name, `Anims_Humans_G${version}.mds`), content)),
+    ) as Promise<undefined[]>
 }
 
 export async function writeVmScript(patch: InputParameters): Promise<void> {
@@ -216,7 +225,7 @@ README.md
   return fs.writeFile(`${patch.name}.vm`, content)
 }
 
-export async function writeDotFiles(patch: InputParameters): Promise<void[]> {
+export async function writeDotFiles(patch: InputParameters): Promise<undefined[]> {
   // Patch validator configuration file
   const contentValidatorYml = `# This file is required for the patch-validator to work and may contain advanced configuration options
 # For more information, visit https://github.com/szapp/patch-validator/#configuration
@@ -327,7 +336,7 @@ Required="314` +
     fs.writeFile('.github/dependabot.yml', contentDependabotYml),
     fs.writeFile('.github/release.yml', contentReleaseYml),
     patch.needsNinja ? fs.writeFile('tool.cfg', contentToolCfg) : undefined,
-  ])
+  ]) as Promise<undefined[]>
 }
 
 export async function writeReadme(patch: InputParameters, templateRepo: string, templateRepoUrl: string): Promise<void> {
@@ -354,6 +363,7 @@ export async function writeReadme(patch: InputParameters, templateRepo: string, 
 
   // Compatibility notice
   let compatible = ''
+  /* istanbul ignore else */
   if (patch.needsVersions.length > 0) {
     compatible = 'It supports '
     const games = patch.needsVersions.map((version) => {
@@ -366,12 +376,15 @@ export async function writeReadme(patch: InputParameters, templateRepo: string, 
           return '<kbd>Gothic II (Classic)</kbd>'
         case 2:
           return '<kbd>Gothic II: NotR</kbd>'
+        /* istanbul ignore next */
+        default:
+          return '*unspecified*'
       }
     })
     if (games.length > 1) {
-      compatible += games.slice(0, -1).join(', ') + ' and ' + games.slice(-1)
+      compatible += `${games.slice(0, -1).join(', ')} and ${games.slice(-1)}`
     } else {
-      compatible += games[0] + ' only'
+      compatible += `${games[0]} only`
     }
     compatible += '.'
   }
@@ -381,11 +394,13 @@ export async function writeReadme(patch: InputParameters, templateRepo: string, 
   if (patch.needsNinja) {
     requirements = '### Requirements\n\n'
     requirements += '<table><thead><tr>'
+    /* istanbul ignore else */
     if (patch.needsVersions.includes(1)) requirements += '<th>Gothic</th>'
     if (patch.needsVersions.includes(112)) requirements += '<th>Gothic Sequel</th>'
     if (patch.needsVersions.includes(130)) requirements += '<th>Gothic II (Classic)</th>'
     if (patch.needsVersions.includes(2)) requirements += '<th>Gothic II: NotR</th>'
     requirements += '</tr></thead>\n<tbody><tr>'
+    /* istanbul ignore else t*/
     if (patch.needsVersions.includes(1))
       requirements += '<td><a href="https://www.worldofgothic.de/dl/download_34.htm">Version 1.08k_mod</a></td>'
     if (patch.needsVersions.includes(112)) requirements += '<td>Version 1.12f</td>'
@@ -432,7 +447,7 @@ Instead refer to the PATCH TEMPLATE to build a foundation that is customized to 
 The patch template can found at ${templateRepoUrl}.
 
 -->
-`
+`,
   )
 }
 
@@ -442,7 +457,7 @@ export async function writeLicense(patch: InputParameters): Promise<void> {
     fs.readFile(path.join('.github', 'actions', 'initialization', 'licenses', 'GothicMOD-Lizenz.txt'), 'utf8'),
   ])
   const licenses =
-    licenseTextG2.replace('20[jj] [Inhaber der ausschließlichen Nutzungsrechte]', new Date().getUTCFullYear() + ' ' + patch.usernameFull) +
+    licenseTextG2.replace('20[jj] [Inhaber der ausschließlichen Nutzungsrechte]', `${new Date().getUTCFullYear()} ${patch.usernameFull}`) +
     '\n\n' +
     licenseTextG1
   return fs.writeFile('LICENSE', licenses, 'utf8')

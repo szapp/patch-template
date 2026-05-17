@@ -1,14 +1,14 @@
-import { InputParameters, VerboseError } from './classes'
-import z from 'zod'
-import * as github from '@actions/github'
+import fs from 'node:fs'
 import * as core from '@actions/core'
-import fs from 'fs'
+import * as github from '@actions/github'
+import z from 'zod'
+import { InputParameters, VerboseError } from './classes.js'
 
 export function parseInputs(inputs: string, errors: VerboseError[]): { userinputs?: InputParameters } {
   if (typeof inputs !== 'string')
     throw new VerboseError(
       'Missing input parameters',
-      'The input parameters are missing. This should not have happened. Please try again. If the error persists, please report it.'
+      'The input parameters are missing. This should not have happened. Please try again. If the error persists, please report it.',
     )
   let json: JSON
   try {
@@ -16,17 +16,20 @@ export function parseInputs(inputs: string, errors: VerboseError[]): { userinput
   } catch {
     throw new VerboseError(
       'Invalid input parameters',
-      'The input parameters could not be parsed as JSON. This should not have happened. Please try again. If the error persists, please report it.'
+      'The input parameters could not be parsed as JSON. This should not have happened. Please try again. If the error persists, please report it.',
     )
   }
   try {
     return { userinputs: InputParameters.parse(json) }
   } catch (error) {
+    /* istanbul ignore else */
     if (error instanceof z.ZodError) {
-      error.issues.forEach((err) => errors.push(new VerboseError(`Invalid input ${err?.path.join('->')}`, err.message)))
+      error.issues.forEach((err) => {
+        errors.push(new VerboseError(`Invalid input ${err?.path.join('->')}`, err.message))
+      })
       return {}
     }
-    // Unexcepted error
+    // Unexpected error
     /* istanbul ignore next */
     throw error
   }
@@ -45,7 +48,7 @@ export async function parseEnv(templateRepo: string): Promise<{
   if (typeof github?.context?.payload?.repository === 'undefined')
     throw new VerboseError(
       'Repository context not available',
-      'Basic information about the repository could not be accessed. Please try again later'
+      'Basic information about the repository could not be accessed. Please try again later',
     )
   const { name: patchName, html_url: url } = github.context.payload.repository
   const description = github.context.payload.repository.description ?? ''
@@ -56,7 +59,7 @@ export async function parseEnv(templateRepo: string): Promise<{
   if (typeof patchName !== 'string' || typeof description !== 'string' || typeof url !== 'string' || typeof repo !== 'string')
     throw new VerboseError(
       'Repository information not available',
-      'Basic information about the repository is invalid. Please try again later'
+      'Basic information about the repository is invalid. Please try again later',
     )
 
   let octokit: ReturnType<typeof github.getOctokit>
@@ -66,7 +69,7 @@ export async function parseEnv(templateRepo: string): Promise<{
   } catch {
     throw new VerboseError(
       'GitHub API token not available',
-      'The GitHub API token is required to access the repository information. Please try again later'
+      'The GitHub API token is required to access the repository information. Please try again later',
     )
   }
 
@@ -75,7 +78,8 @@ export async function parseEnv(templateRepo: string): Promise<{
   const { data } = await octokit.rest.users.getByUsername({ username })
   const usernameFull = data?.name ?? username
   const actorId = data?.id ?? ''
-  const userEmail = `${actorId ? actorId + '+' : ''}${username}@users.noreply.github.com`
+  const actorPrefix = `${actorId}+`
+  const userEmail = `${actorId ? actorPrefix : ''}${username}@users.noreply.github.com`
 
   // Check if repository is generated template from source
   const {
@@ -85,30 +89,42 @@ export async function parseEnv(templateRepo: string): Promise<{
     // Must not be a fork
     throw new VerboseError(
       'Repository must not be a fork',
-      `The repository must not be a fork of the template repository. Please create a new repository, generated from the template ${templateRepo}.`
+      `The repository must not be a fork of the template repository. Please create a new repository, generated from the template ${templateRepo}.`,
     )
   }
   if (!is_private && template_repository?.full_name !== templateRepo) {
     // Must be sourced from the template
     throw new VerboseError(
       'Repository must be generated from the official template',
-      `The repository must be generated from the official template repository. Please create a new repository, generated from the template ${templateRepo}.`
+      `The repository must be generated from the official template repository. Please create a new repository, generated from the template ${templateRepo}.`,
     )
   }
   if (is_template) {
     // Must not be a template
     throw new VerboseError(
       'Repository must not be a template',
-      'The repository must not be a template repository. Please create change the settings of this repository and try again.'
+      'The repository must not be a template repository. Please create change the settings of this repository and try again.',
     )
   }
 
   const topicList = typeof topics === 'undefined' ? [] : topics.map((t) => t.toLowerCase())
 
-  return { name: patchName, description, url, repo, topics: topicList, username, usernameFull, userEmail }
+  return {
+    name: patchName,
+    description,
+    url,
+    repo,
+    topics: topicList,
+    username,
+    usernameFull,
+    userEmail,
+  }
 }
 
-export function parsePackage(errors: VerboseError[]): { templateRepo: string; templateRepoUrl: string } {
+export function parsePackage(errors: VerboseError[]): {
+  templateRepo: string
+  templateRepoUrl: string
+} {
   let templateRepo = ''
   let templateRepoUrl = ''
   try {
@@ -119,8 +135,8 @@ export function parsePackage(errors: VerboseError[]): { templateRepo: string; te
     errors.push(
       new VerboseError(
         'Missing package metadata',
-        'The template repository metadata could not be accessed. This should not have happened. Please try again. If the error persists, please report it. Please note that this process only works from the original template repository.'
-      )
+        'The template repository metadata could not be accessed. This should not have happened. Please try again. If the error persists, please report it. Please note that this process only works from the original template repository.',
+      ),
     )
   }
   return { templateRepo, templateRepoUrl }

@@ -1,34 +1,55 @@
-import * as core from '@actions/core'
-import * as inputs from '../src/inputs'
-import fs from 'fs'
-import { warnings } from '../src/main'
-import { VerboseError } from '../src/classes'
+import fs from 'node:fs'
+import type { context } from '@actions/github'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { VerboseError } from './classes.js'
+import * as inputs from './inputs.js'
+import { warnings } from './main.js'
 
-let readFileSyncMock: jest.SpiedFunction<typeof fs.readFileSync>
+const readFileSyncMock = vi.spyOn(fs, 'readFileSync')
+const parseInputsMock = vi.spyOn(inputs, 'parseInputs')
+const parseEnvMock = vi.spyOn(inputs, 'parseEnv')
+const parsePackageMock = vi.spyOn(inputs, 'parsePackage')
+const checkPatchNameMock = vi.spyOn(inputs, 'checkPatchName')
+const checkPatchDescMock = vi.spyOn(inputs, 'checkPatchDesc')
 
-const parseInputsMock = jest.spyOn(inputs, 'parseInputs')
-const parseEnvMock = jest.spyOn(inputs, 'parseEnv')
-const parsePackageMock = jest.spyOn(inputs, 'parsePackage')
-const checkPatchNameMock = jest.spyOn(inputs, 'checkPatchName')
-const checkPatchDescMock = jest.spyOn(inputs, 'checkPatchDesc')
+// Mock the GitHub Actions libraries
+vi.mock(import('@actions/core'), async (importOriginal) => {
+  const originalModule = await importOriginal()
+  return {
+    ...originalModule,
+    getInput: vi.fn().mockResolvedValue(''),
+  }
+})
+
+// Mock github's context in an accessible way
+const { githubMock } = vi.hoisted(() => ({
+  githubMock: {
+    context: {} as typeof context,
+    getOctokit: vi.fn(),
+  },
+}))
+vi.mock(import('@actions/github'), async () => {
+  return githubMock
+})
 
 describe('parseInputs', () => {
   beforeEach(() => {
     while (warnings.length > 0) warnings.pop()
   })
 
-  it('throws an error if input is missing', () => {
+  test('throws an error if input is missing', () => {
     const inputParams = undefined
     const errors: VerboseError[] = []
 
     expect(() => {
+      // biome-ignore lint/style/noNonNullAssertion: That is what is being tested here
       inputs.parseInputs(inputParams!, errors)
     }).toThrow('Missing input parameters')
     expect(warnings.length).toBe(0)
     expect(errors.length).toBe(0)
   })
 
-  it('throws an error if input parameters cannot be parsed as JSON', () => {
+  test('throws an error if input parameters cannot be parsed as JSON', () => {
     const inputParams = 'invalid-json'
     const errors: VerboseError[] = []
 
@@ -39,7 +60,7 @@ describe('parseInputs', () => {
     expect(errors.length).toBe(0)
   })
 
-  it('aggregates errors for missing parameters', () => {
+  test('aggregates errors for missing parameters', () => {
     const inputParams = '{"param1": "value1", "param2": "value2"}'
     const errors: VerboseError[] = []
 
@@ -63,7 +84,7 @@ describe('parseInputs', () => {
     expect(errors[12]).toEqual(new VerboseError('Invalid input Animations', 'Required'))
   })
 
-  it('aggregates errors for invalid parameters', () => {
+  test('aggregates errors for invalid parameters', () => {
     const inputParams = {
       'Content scripts': {
         'Gothic 1': 'false',
@@ -93,21 +114,21 @@ describe('parseInputs', () => {
     expect(errors[0]).toEqual(new VerboseError('Invalid input Content scripts->Gothic Sequel', 'Invalid input'))
     expect(errors[1]).toEqual(new VerboseError('Invalid input Content scripts->Gothic 2 Classic', 'Invalid input'))
     expect(errors[2]).toEqual(new VerboseError('Invalid input Content scripts->Gothic 2 NotR', 'Invalid input'))
-    expect(errors[3]).toEqual(new VerboseError('Invalid input Ikarus and LeGo', 'Expected object, received number'))
+    expect(errors[3]).toEqual(new VerboseError('Invalid input Ikarus and LeGo', 'Invalid input: expected object, received number'))
     expect(errors[4]).toEqual(new VerboseError('Invalid input Content initialization->Content initialization function', 'Invalid input'))
     expect(errors[5]).toEqual(new VerboseError('Invalid input Menu initialization->Menu initialization function', 'Invalid input'))
-    expect(errors[6]).toEqual(new VerboseError('Invalid input Menu scripts', 'Expected object, received string'))
-    expect(errors[7]).toEqual(new VerboseError('Invalid input Particle FX scripts', 'Expected object, received string'))
-    expect(errors[8]).toEqual(new VerboseError('Invalid input Visual FX scripts', 'Expected object, received string'))
-    expect(errors[9]).toEqual(new VerboseError('Invalid input Sound FX scripts', 'Expected object, received string'))
-    expect(errors[10]).toEqual(new VerboseError('Invalid input Music scripts', 'Expected object, received string'))
-    expect(errors[11]).toEqual(new VerboseError('Invalid input Camera scripts', 'Expected object, received string'))
-    expect(errors[12]).toEqual(new VerboseError('Invalid input Fight AI scripts', 'Expected object, received string'))
-    expect(errors[13]).toEqual(new VerboseError('Invalid input Output units', 'Expected object, received string'))
-    expect(errors[14]).toEqual(new VerboseError('Invalid input Animations', 'Expected object, received string'))
+    expect(errors[6]).toEqual(new VerboseError('Invalid input Menu scripts', 'Invalid input: expected object, received string'))
+    expect(errors[7]).toEqual(new VerboseError('Invalid input Particle FX scripts', 'Invalid input: expected object, received string'))
+    expect(errors[8]).toEqual(new VerboseError('Invalid input Visual FX scripts', 'Invalid input: expected object, received string'))
+    expect(errors[9]).toEqual(new VerboseError('Invalid input Sound FX scripts', 'Invalid input: expected object, received string'))
+    expect(errors[10]).toEqual(new VerboseError('Invalid input Music scripts', 'Invalid input: expected object, received string'))
+    expect(errors[11]).toEqual(new VerboseError('Invalid input Camera scripts', 'Invalid input: expected object, received string'))
+    expect(errors[12]).toEqual(new VerboseError('Invalid input Fight AI scripts', 'Invalid input: expected object, received string'))
+    expect(errors[13]).toEqual(new VerboseError('Invalid input Output units', 'Invalid input: expected object, received string'))
+    expect(errors[14]).toEqual(new VerboseError('Invalid input Animations', 'Invalid input: expected object, received string'))
   })
 
-  it('fails for incompatible inputs', () => {
+  test('fails for incompatible inputs', () => {
     const basicInputs = {
       'Gothic 1': false,
       'Gothic Sequel': 'false',
@@ -145,15 +166,15 @@ describe('parseInputs', () => {
     expect(warnings[0]).toEqual(new VerboseError('LeGo is enabled without Ikarus', 'LeGo requires Ikarus. Adding Ikarus to selection'))
     expect(errors.length).toBe(3)
     expect(errors[0]).toEqual(
-      new VerboseError('Invalid input Content initialization', 'Cannot use initialization without using content scripts')
+      new VerboseError('Invalid input Content initialization', 'Cannot use initialization without using content scripts'),
     )
     expect(errors[1]).toEqual(
-      new VerboseError('Invalid input Menu initialization', 'Cannot use initialization without using content scripts')
+      new VerboseError('Invalid input Menu initialization', 'Cannot use initialization without using content scripts'),
     )
     expect(errors[2]).toEqual(new VerboseError('Invalid input Ikarus and LeGo->Ikarus', 'Cannot use Ikarus without using content scripts'))
   })
 
-  it('parses valid varying inputs (no content)', () => {
+  test('parses valid varying inputs (no content)', () => {
     const g1Inputs = {
       'Gothic 1': 'true',
       'Gothic Sequel': 'false',
@@ -244,7 +265,7 @@ describe('parseInputs', () => {
     expect(result).toEqual({ userinputs: output })
   })
 
-  it('parses valid varying inputs (only anim)', () => {
+  test('parses valid varying inputs (only anim)', () => {
     const g1Inputs = {
       'Gothic 1': 'true',
       'Gothic Sequel': 'false',
@@ -317,7 +338,7 @@ describe('parseInputs', () => {
     expect(result).toEqual({ userinputs: output })
   })
 
-  it('parses valid input all true', () => {
+  test('parses valid input all true', () => {
     const basicInputs = {
       'Gothic 1': 'true',
       'Gothic Sequel': 'true',
@@ -376,8 +397,6 @@ describe('parseInputs', () => {
       topics: [] as string[],
     }
     const errors: VerboseError[] = []
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const warnings = require('../src/main').warnings
 
     const result = inputs.parseInputs(JSON.stringify(inputParams), errors)
     expect(parseInputsMock).toHaveReturned()
@@ -388,62 +407,59 @@ describe('parseInputs', () => {
 })
 
 describe('parseEnv', () => {
-  it('throws an error if repository context is not available', async () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
+  test('throws an error if repository context is not available', async () => {
+    githubMock.context = {} as typeof context
     await expect(inputs.parseEnv('')).rejects.toThrow('Repository context not available')
   })
 
-  it('throws an error if repository information is invalid', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const github = require('@actions/github')
-    github.context = {
-      payload: {
-        repository: {
-          name: 123, // Invalid type
-          description: 'description',
-          html_url: 'https://github.com/user/repo',
-        },
+  test('throws an error if repository information is invalid', async () => {
+    githubMock.context.payload = {
+      repository: {
+        // @ts-expect-error provoke incorrect type for sanity test
+        name: 123, // Invalid type
+        description: 'description',
+        html_url: 'https://github.com/user/repo',
       },
     }
 
     await expect(inputs.parseEnv('')).rejects.toThrow('Repository information not available')
   })
 
-  it('throws an error if GitHub API token is not available', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const github = require('@actions/github')
-    github.context = {
+  test('throws an error if GitHub API token is not available', async () => {
+    githubMock.context = {
       payload: {
         repository: {
           name: 'repo',
           html_url: 'https://github.com/user/repo',
         },
       },
-    }
-    jest.spyOn(core, 'getInput').mockReturnValue('')
+    } as typeof context
+    githubMock.getOctokit.mockThrow(new Error('Test error'))
 
     await expect(inputs.parseEnv('')).rejects.toThrow('GitHub API token not available')
   })
 
-  it('throws an error if repository is not found', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const github = require('@actions/github')
-    github.context = {
-      actor: 'john-doe',
+  test('throws an error if repository is not found', async () => {
+    githubMock.context = {
       payload: {
         repository: {
           name: 'repo',
-          description: 'description',
           html_url: 'https://github.com/user/repo',
         },
       },
-    }
-    github.getOctokit = jest.fn().mockReturnValue({
+    } as typeof context
+    githubMock.context.actor = 'john-doe'
+    githubMock.getOctokit.mockReturnValue({
       rest: {
         repos: {
-          get: jest.fn().mockResolvedValue({ data: {} }),
+          get: vi.fn().mockResolvedValue({ data: {} }),
         },
         users: {
-          getByUsername: jest.fn().mockResolvedValue({
+          getByUsername: vi.fn().mockResolvedValue({
             data: {
               name: 'John Doe',
               id: 123,
@@ -453,14 +469,12 @@ describe('parseEnv', () => {
       },
     })
 
-    jest.replaceProperty(process, 'env', { GITHUB_TRIGGERING_ACTOR: 'john-doe' })
+    vi.stubEnv('GITHUB_TRIGGERING_ACTOR', 'john-doe')
     await expect(inputs.parseEnv('user/templateRepo')).rejects.toThrow('Repository must be generated from the official template')
   })
 
-  it('throws an error if repository is a fork', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const github = require('@actions/github')
-    github.context = {
+  test('throws an error if repository is a fork', async () => {
+    githubMock.context = {
       actor: 'john-doe',
       payload: {
         repository: {
@@ -469,11 +483,11 @@ describe('parseEnv', () => {
           html_url: 'https://github.com/user/repo',
         },
       },
-    }
-    github.getOctokit = jest.fn().mockReturnValue({
+    } as unknown as typeof context
+    githubMock.getOctokit.mockReturnValue({
       rest: {
         repos: {
-          get: jest.fn().mockResolvedValue({
+          get: vi.fn().mockResolvedValue({
             data: {
               fork: true,
               is_template: false,
@@ -484,7 +498,7 @@ describe('parseEnv', () => {
           }),
         },
         users: {
-          getByUsername: jest.fn().mockResolvedValue({
+          getByUsername: vi.fn().mockResolvedValue({
             data: {
               name: 'John Doe',
               id: 123,
@@ -494,14 +508,12 @@ describe('parseEnv', () => {
       },
     })
 
-    jest.replaceProperty(process, 'env', { GITHUB_TRIGGERING_ACTOR: 'john-doe' })
+    vi.stubEnv('GITHUB_TRIGGERING_ACTOR', 'john-doe')
     await expect(inputs.parseEnv('user/templateRepo')).rejects.toThrow('Repository must not be a fork')
   })
 
-  it('throws an error if repository is generated from a wrong template', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const github = require('@actions/github')
-    github.context = {
+  test('throws an error if repository is generated from a wrong template', async () => {
+    githubMock.context = {
       actor: 'john-doe',
       payload: {
         repository: {
@@ -510,11 +522,11 @@ describe('parseEnv', () => {
           html_url: 'https://github.com/user/repo',
         },
       },
-    }
-    github.getOctokit = jest.fn().mockReturnValue({
+    } as unknown as typeof context
+    githubMock.getOctokit.mockReturnValue({
       rest: {
         repos: {
-          get: jest.fn().mockResolvedValue({
+          get: vi.fn().mockResolvedValue({
             data: {
               private: false,
               fork: false,
@@ -526,7 +538,7 @@ describe('parseEnv', () => {
           }),
         },
         users: {
-          getByUsername: jest.fn().mockResolvedValue({
+          getByUsername: vi.fn().mockResolvedValue({
             data: {
               name: 'John Doe',
               id: 123,
@@ -536,14 +548,12 @@ describe('parseEnv', () => {
       },
     })
 
-    jest.replaceProperty(process, 'env', { GITHUB_TRIGGERING_ACTOR: 'john-doe' })
+    vi.stubEnv('GITHUB_TRIGGERING_ACTOR', 'john-doe')
     await expect(inputs.parseEnv('user/templateRepo')).rejects.toThrow('Repository must be generated from the official template')
   })
 
-  it('throws an error if repository is a template', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const github = require('@actions/github')
-    github.context = {
+  test('throws an error if repository is a template', async () => {
+    githubMock.context = {
       actor: 'john-doe',
       payload: {
         repository: {
@@ -552,11 +562,11 @@ describe('parseEnv', () => {
           html_url: 'https://github.com/user/repo',
         },
       },
-    }
-    github.getOctokit = jest.fn().mockReturnValue({
+    } as unknown as typeof context
+    githubMock.getOctokit.mockReturnValue({
       rest: {
         repos: {
-          get: jest.fn().mockResolvedValue({
+          get: vi.fn().mockResolvedValue({
             data: {
               fork: false,
               is_template: true,
@@ -567,7 +577,7 @@ describe('parseEnv', () => {
           }),
         },
         users: {
-          getByUsername: jest.fn().mockResolvedValue({
+          getByUsername: vi.fn().mockResolvedValue({
             data: {
               name: 'John Doe',
               id: 123,
@@ -577,14 +587,12 @@ describe('parseEnv', () => {
       },
     })
 
-    jest.replaceProperty(process, 'env', { GITHUB_TRIGGERING_ACTOR: 'john-doe' })
+    vi.stubEnv('GITHUB_TRIGGERING_ACTOR', 'john-doe')
     await expect(inputs.parseEnv('user/templateRepo')).rejects.toThrow('Repository must not be a template')
   })
 
-  it('returns parsed environment information (no process.env)', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const github = require('@actions/github')
-    github.context = {
+  test('returns parsed environment information (no process.env)', async () => {
+    githubMock.context = {
       actor: 'john-doe',
       payload: {
         repository: {
@@ -593,11 +601,11 @@ describe('parseEnv', () => {
           html_url: 'https://github.com/user/repo',
         },
       },
-    }
-    github.getOctokit = jest.fn().mockReturnValue({
+    } as unknown as typeof context
+    githubMock.getOctokit.mockReturnValue({
       rest: {
         repos: {
-          get: jest.fn().mockResolvedValue({
+          get: vi.fn().mockResolvedValue({
             data: {
               fork: false,
               is_template: false,
@@ -608,7 +616,7 @@ describe('parseEnv', () => {
           }),
         },
         users: {
-          getByUsername: jest.fn().mockResolvedValue({
+          getByUsername: vi.fn().mockResolvedValue({
             data: {
               name: 'John Doe',
               id: 123,
@@ -618,7 +626,7 @@ describe('parseEnv', () => {
       },
     })
 
-    jest.replaceProperty(process, 'env', { GITHUB_TRIGGERING_ACTOR: undefined })
+    vi.stubEnv('GITHUB_TRIGGERING_ACTOR', undefined)
     const result = await inputs.parseEnv('user/templateRepo')
     expect(parseEnvMock).toHaveReturned()
     expect(result).toEqual({
@@ -633,10 +641,8 @@ describe('parseEnv', () => {
     })
   })
 
-  it('returns parsed environment information (with process.env)', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const github = require('@actions/github')
-    github.context = {
+  test('returns parsed environment information (with process.env)', async () => {
+    githubMock.context = {
       payload: {
         repository: {
           name: 'repo',
@@ -644,11 +650,11 @@ describe('parseEnv', () => {
           html_url: 'https://github.com/user/repo',
         },
       },
-    }
-    github.getOctokit = jest.fn().mockReturnValue({
+    } as unknown as typeof context
+    githubMock.getOctokit.mockReturnValue({
       rest: {
         repos: {
-          get: jest.fn().mockResolvedValue({
+          get: vi.fn().mockResolvedValue({
             data: {
               fork: false,
               is_template: false,
@@ -660,7 +666,7 @@ describe('parseEnv', () => {
           }),
         },
         users: {
-          getByUsername: jest.fn().mockResolvedValue({
+          getByUsername: vi.fn().mockResolvedValue({
             data: {
               name: 'John Doe',
               id: 123,
@@ -670,7 +676,7 @@ describe('parseEnv', () => {
       },
     })
 
-    jest.replaceProperty(process, 'env', { GITHUB_TRIGGERING_ACTOR: 'john-doe' })
+    vi.stubEnv('GITHUB_TRIGGERING_ACTOR', 'john-doe')
     const result = await inputs.parseEnv('user/templateRepo')
     expect(parseEnvMock).toHaveReturned()
     expect(result).toEqual({
@@ -685,10 +691,8 @@ describe('parseEnv', () => {
     })
   })
 
-  it('returns parsed environment information (no octokit)', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const github = require('@actions/github')
-    github.context = {
+  test('returns parsed environment information (no octokit)', async () => {
+    githubMock.context = {
       payload: {
         repository: {
           name: 'repo',
@@ -696,11 +700,11 @@ describe('parseEnv', () => {
           html_url: 'https://github.com/user/repo',
         },
       },
-    }
-    github.getOctokit = jest.fn().mockReturnValue({
+    } as unknown as typeof context
+    githubMock.getOctokit.mockReturnValue({
       rest: {
         repos: {
-          get: jest.fn().mockResolvedValue({
+          get: vi.fn().mockResolvedValue({
             data: {
               fork: false,
               is_template: false,
@@ -711,12 +715,12 @@ describe('parseEnv', () => {
           }),
         },
         users: {
-          getByUsername: jest.fn().mockResolvedValue({}),
+          getByUsername: vi.fn().mockResolvedValue({}),
         },
       },
     })
 
-    jest.replaceProperty(process, 'env', { GITHUB_TRIGGERING_ACTOR: 'john-doe' })
+    vi.stubEnv('GITHUB_TRIGGERING_ACTOR', 'john-doe')
     const result = await inputs.parseEnv('user/templateRepo')
     expect(parseEnvMock).toHaveReturned()
     expect(result).toEqual({
@@ -734,12 +738,12 @@ describe('parseEnv', () => {
 
 describe('parsePackage', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
-    readFileSyncMock = jest.spyOn(fs, 'readFileSync').mockImplementation()
+    readFileSyncMock.mockImplementation(() => '')
   })
 
-  it('parse package metadata with git extension', () => {
+  test('parse package metadata with git extension', () => {
     const metadata = {
       repository: {
         url: 'https://github.com/username/repo.git',
@@ -758,7 +762,7 @@ describe('parsePackage', () => {
     expect(errors.length).toBe(0)
   })
 
-  it('parse package metadata without git extension and licence info', () => {
+  test('parse package metadata without git extension and licence info', () => {
     const metadata = {
       repository: {
         url: 'https://github.com/username/repo',
@@ -777,7 +781,7 @@ describe('parsePackage', () => {
     expect(errors.length).toBe(0)
   })
 
-  it('parse package metadata with invalid url', () => {
+  test('parse package metadata with invalid url', () => {
     const metadata = {
       repository: {
         url: 'https://example.com',
@@ -796,7 +800,7 @@ describe('parsePackage', () => {
     expect(errors.length).toBe(0)
   })
 
-  it('adds an error on inaccessible package metadata', () => {
+  test('adds an error on inaccessible package metadata', () => {
     readFileSyncMock.mockImplementation(() => {
       throw new Error('File not found')
     })
@@ -810,15 +814,16 @@ describe('parsePackage', () => {
     expect(errors[0]).toEqual(
       new VerboseError(
         'Missing package metadata',
-        'The template repository metadata could not be accessed. This should not have happened. Please try again. If the error persists, please report it.'
-      )
+        'The template repository metadata could not be accessed. This should not have happened. Please try again. If the error persists, please report it. Please note that this process only works from the original template repository.',
+      ),
     )
   })
 })
 
 describe('checkPatchName', () => {
-  it('validates patch name with valid input', () => {
-    const name = 'a'.repeat(60 - 3) + '_A2'
+  test('validates patch name with valid input', () => {
+    const namePredix = 'a'.repeat(60 - 3)
+    const name = `${namePredix}_A2`
     const errors: VerboseError[] = []
 
     inputs.checkPatchName(name, errors)
@@ -826,7 +831,7 @@ describe('checkPatchName', () => {
     expect(errors.length).toBe(0)
   })
 
-  it('adds error for patch name that is too long', () => {
+  test('adds error for patch name that is too long', () => {
     const name = 'a'.repeat(61)
     const errors: VerboseError[] = []
 
@@ -837,7 +842,7 @@ describe('checkPatchName', () => {
     expect(errors[0].message).toBe('The patch name may not exceed 60 characters')
   })
 
-  it('adds error for patch name that is empty', () => {
+  test('adds error for patch name that is empty', () => {
     const name = ''
     const errors: VerboseError[] = []
 
@@ -847,8 +852,9 @@ describe('checkPatchName', () => {
     expect(errors[0].message).toBe('The patch name may not be empty')
   })
 
-  it('adds error for patch name with leading digit', () => {
-    const name = '1' + 'a'.repeat(56) + '_A2'
+  test('adds error for patch name with leading digit', () => {
+    const nameContent = 'a'.repeat(56)
+    const name = `1${nameContent}_A2`
     const errors: VerboseError[] = []
 
     inputs.checkPatchName(name, errors)
@@ -857,8 +863,10 @@ describe('checkPatchName', () => {
     expect(errors[0].message).toBe('The patch name may not start with a digit')
   })
 
-  it('adds error for patch name with illegal characters', () => {
-    const name = 'a'.repeat(60 - 3 - 26) + '_A2' + '!^#%*(){}[]:;?/.,\\`~><|&"\''
+  test('adds error for patch name with illegal characters', () => {
+    const namePrefix = 'a'.repeat(60 - 3 - 26)
+    const namePostfix = '!^#%*(){}[]:;?/.,\\`~><|&"\''
+    const name = `${namePrefix}_A2${namePostfix}`
     const errors: VerboseError[] = []
 
     inputs.checkPatchName(name, errors)
@@ -867,8 +875,10 @@ describe('checkPatchName', () => {
     expect(errors[0].message).toBe('The patch name may only contain characters from `0-9a-zA-Z_`')
   })
 
-  it('adds error for patch name violating most rules', () => {
-    const name = '1' + 'a'.repeat(61 - 1 - 3 - 26) + '_A2' + '!^#%*(){}[]:;?/.,\\`~><|&"\''
+  test('adds error for patch name violating most rules', () => {
+    const nameContent = 'a'.repeat(61 - 1 - 3 - 26)
+    const namePostfix = '!^#%*(){}[]:;?/.,\\`~><|&"\''
+    const name = `1${nameContent}_A2${namePostfix}`
     const errors: VerboseError[] = []
 
     expect(name.length).toBe(61)
@@ -882,8 +892,10 @@ describe('checkPatchName', () => {
 })
 
 describe('checkPatchDesc', () => {
-  it('validates patch description with valid input (no lines breaks)', () => {
-    const description = 'a'.repeat(250 - 24) + '1_-!@#%*(){}[]:;?/.,\\`~'
+  test('validates patch description with valid input (no lines breaks)', () => {
+    const descPrefix = 'a'.repeat(250 - 24)
+    const descPostfix = '1_-!@#%*(){}[]:;?/.,\\`~'
+    const description = `${descPrefix}${descPostfix}`
     const errors: VerboseError[] = []
 
     inputs.checkPatchDesc(description, errors)
@@ -891,8 +903,11 @@ describe('checkPatchDesc', () => {
     expect(errors.length).toBe(0)
   })
 
-  it('validates patch description with valid input (three line breaks)', () => {
-    const description = 'a'.repeat(250 - 3 * 3 - 24) + '%%N'.repeat(3) + '1_-!@#%*(){}[]:;?/.,\\`~'
+  test('validates patch description with valid input (three line breaks)', () => {
+    const descPrefix = 'a'.repeat(250 - 3 * 3 - 24)
+    const linebreaks = '%%N'.repeat(3)
+    const descPostfix = '1_-!@#%*(){}[]:;?/.,\\`~'
+    const description = `${descPrefix}${linebreaks}${descPostfix}`
     const errors: VerboseError[] = []
 
     inputs.checkPatchDesc(description, errors)
@@ -900,7 +915,7 @@ describe('checkPatchDesc', () => {
     expect(errors.length).toBe(0)
   })
 
-  it('adds error for empty patch description', () => {
+  test('adds error for empty patch description', () => {
     const description = ''
     const errors: VerboseError[] = []
 
@@ -910,8 +925,11 @@ describe('checkPatchDesc', () => {
     expect(errors[0].message).toBe('The patch description may not be empty')
   })
 
-  it('adds error for patch description that is too long', () => {
-    const description = 'a'.repeat(255 + 3 - 3 * 3 - 23) + '%%N'.repeat(3) + '1_-!@#%*(){}[]:;?/.,\\`~'
+  test('adds error for patch description that is too long', () => {
+    const descPrefix = 'a'.repeat(255 + 3 - 3 * 3 - 23)
+    const linebreaks = '%%N'.repeat(3)
+    const descPostfix = '1_-!@#%*(){}[]:;?/.,\\`~'
+    const description = `${descPrefix}${linebreaks}${descPostfix}`
     const errors: VerboseError[] = []
 
     expect(description.length).toBe(255 + 3)
@@ -921,8 +939,11 @@ describe('checkPatchDesc', () => {
     expect(errors[0].message).toBe('The patch description may not exceed 254 characters')
   })
 
-  it('adds error for patch description with more than 3 line breaks', () => {
-    const description = 'a'.repeat(250 - 4 * 3 - 24) + '%%N'.repeat(4) + '1_-!@#%*(){}[]:;?/.,\\`~'
+  test('adds error for patch description with more than 3 line breaks', () => {
+    const descPrefix = 'a'.repeat(250 - 4 * 3 - 24)
+    const linebreaks = '%%N'.repeat(4)
+    const descPostfix = '1_-!@#%*(){}[]:;?/.,\\`~'
+    const description = `${descPrefix}${linebreaks}${descPostfix}`
     const errors: VerboseError[] = []
 
     inputs.checkPatchDesc(description, errors)
@@ -931,8 +952,11 @@ describe('checkPatchDesc', () => {
     expect(errors[0].message).toBe('The patch description may not contain more than 3 line breaks (%%N)')
   })
 
-  it('adds error for patch description violating all rules', () => {
-    const description = 'a'.repeat(255 + 4 - 4 * 3 - 23 - 4) + '%%N'.repeat(4) + '1_-!@#%*(){}[]:;?/.,\\`~' + '><|&'
+  test('adds error for patch description violating all rules', () => {
+    const descPrefix = 'a'.repeat(255 + 4 - 4 * 3 - 23 - 4)
+    const linebreaks = '%%N'.repeat(4)
+    const descPostfix = '1_-!@#%*(){}[]:;?/.,\\`~><|&'
+    const description = `${descPrefix}${linebreaks}${descPostfix}`
     const errors: VerboseError[] = []
 
     expect(description.length).toBe(255 + 4)

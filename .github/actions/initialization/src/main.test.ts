@@ -1,29 +1,28 @@
 import * as core from '@actions/core'
-import * as main from '../src/main'
-import * as inputs from '../src/inputs'
-import * as files from '../src/files'
-import * as infos from '../src/infos'
-import * as git from '../src/git'
-import { AggregateError, VerboseError, InputParameters } from '../src/classes'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { AggregationError, type InputParameters, VerboseError } from './classes.js'
+import * as files from './files.js'
+import * as git from './git.js'
+import * as infos from './infos.js'
+import * as inputs from './inputs.js'
+import * as main from './main.js'
 
-jest.mock('@actions/core')
-jest.mock('../src/inputs')
-jest.mock('../src/files')
-jest.mock('../src/infos')
-jest.mock('../src/git')
+vi.mock('@actions/core')
 
-const runMock = jest.spyOn(main, 'run')
+const runMock = vi.spyOn(main, 'run')
 
 describe('run', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+
+    vi.spyOn(inputs, 'parsePackage').mockReturnValue({ templateRepo: 'repo', templateRepoUrl: 'repoUrl' })
 
     while (main.errors.length > 0) main.errors.pop()
     while (main.warnings.length > 0) main.warnings.pop()
     while (main.infos.length > 0) main.infos.pop()
   })
 
-  it('should run the main function successfully', async () => {
+  test('should run the main function successfully', async () => {
     const envInputs = {
       name: 'Test',
       description: 'Test description',
@@ -50,32 +49,30 @@ describe('run', () => {
     const outputWarnings = '> [!WARNING]\n> ### Test warning\n> <i>Test details</i>'
     const outputInfos = '<h3>:one: Test info</h3>Test details'
 
-    jest.spyOn(inputs, 'parseEnv').mockResolvedValue(envInputs)
-    jest.spyOn(inputs, 'parsePackage').mockReturnValue({ templateRepo: 'repo', templateRepoUrl: 'repoUrl' })
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    jest.spyOn(inputs, 'parseInputs').mockImplementation((_inputs, _errors) => {
+    vi.spyOn(inputs, 'parseEnv').mockResolvedValue(envInputs)
+    vi.spyOn(inputs, 'parseInputs').mockImplementation((_inputs, _errors) => {
       main.warnings.push(new VerboseError('Test warning', 'Test details'))
       return { userinputs: userInputs }
     })
-    jest.spyOn(inputs, 'checkPatchName').mockImplementation()
-    jest.spyOn(inputs, 'checkPatchDesc').mockImplementation()
-    jest.spyOn(files, 'createDirs').mockResolvedValue()
-    jest.spyOn(files, 'writeContentSrcFiles').mockResolvedValue()
-    jest.spyOn(files, 'writeInitialization').mockResolvedValue()
-    jest.spyOn(files, 'writeSrcFiles').mockResolvedValue()
-    jest.spyOn(files, 'writeOuFiles').mockResolvedValue()
-    jest.spyOn(files, 'writeAnimFiles').mockResolvedValue()
-    jest.spyOn(files, 'writeVmScript').mockResolvedValue()
-    jest.spyOn(files, 'writeDotFiles').mockResolvedValue([])
-    jest.spyOn(files, 'writeReadme').mockResolvedValue()
-    jest.spyOn(files, 'writeLicense').mockResolvedValue()
-    jest.spyOn(files, 'removeFiles').mockResolvedValue()
-    jest.spyOn(infos, 'listNextSteps').mockImplementation((_patch, infos) => {
+    vi.spyOn(inputs, 'checkPatchName').mockImplementation(() => {})
+    vi.spyOn(inputs, 'checkPatchDesc').mockImplementation(() => {})
+    vi.spyOn(files, 'createDirs').mockResolvedValue()
+    vi.spyOn(files, 'writeContentSrcFiles').mockResolvedValue()
+    vi.spyOn(files, 'writeInitialization').mockResolvedValue()
+    vi.spyOn(files, 'writeSrcFiles').mockResolvedValue()
+    vi.spyOn(files, 'writeOuFiles').mockResolvedValue(undefined)
+    vi.spyOn(files, 'writeAnimFiles').mockResolvedValue(undefined)
+    vi.spyOn(files, 'writeVmScript').mockResolvedValue()
+    vi.spyOn(files, 'writeDotFiles').mockResolvedValue([])
+    vi.spyOn(files, 'writeReadme').mockResolvedValue()
+    vi.spyOn(files, 'writeLicense').mockResolvedValue()
+    vi.spyOn(files, 'removeFiles').mockResolvedValue()
+    vi.spyOn(infos, 'listNextSteps').mockImplementation((_patch, infos) => {
       infos.push(new VerboseError('Test info', 'Test details'))
     })
-    jest.spyOn(infos, 'header').mockReturnValue('')
-    jest.spyOn(git, 'setupIdentity').mockResolvedValue()
-    jest.spyOn(git, 'commit').mockResolvedValue()
+    vi.spyOn(infos, 'header').mockReturnValue('')
+    vi.spyOn(git, 'setupIdentity').mockResolvedValue()
+    vi.spyOn(git, 'commit').mockResolvedValue()
 
     await main.run()
     expect(runMock).toHaveReturned()
@@ -145,10 +142,10 @@ describe('run', () => {
     expect(core.summary.write).toHaveReturned()
   })
 
-  it('should handle errors and set the appropriate outputs (Error)', async () => {
+  test('should handle errors and set the appropriate outputs (Error)', async () => {
     const error = new Error('Test error')
     const output = '<table><tr><td width="2000"><sub><kbd>:x: Error</kbd></sub><h3>Test error</h3><i></i><br /></td></tr></table>'
-    jest.spyOn(inputs, 'parseEnv').mockRejectedValue(error)
+    vi.spyOn(inputs, 'parseEnv').mockRejectedValue(error)
 
     await main.run()
     expect(runMock).toHaveReturned()
@@ -167,11 +164,11 @@ describe('run', () => {
     expect(process.exitCode).toBe(core.ExitCode.Failure)
   })
 
-  it('should handle errors and set the appropriate outputs (VerboseError)', async () => {
+  test('should handle errors and set the appropriate outputs (VerboseError)', async () => {
     const error = new VerboseError('Test error', 'Error details')
     const output =
       '<table><tr><td width="2000"><sub><kbd>:x: Error</kbd></sub><h3>Test error</h3><i>Error details</i><br /></td></tr></table>'
-    jest.spyOn(inputs, 'parseEnv').mockRejectedValue(error)
+    vi.spyOn(inputs, 'parseEnv').mockRejectedValue(error)
 
     await main.run()
     expect(runMock).toHaveReturned()
@@ -190,10 +187,10 @@ describe('run', () => {
     expect(process.exitCode).toBe(core.ExitCode.Failure)
   })
 
-  it('should handle errors and set the appropriate outputs (non-Error)', async () => {
+  test('should handle errors and set the appropriate outputs (non-Error)', async () => {
     const error = 'Test error'
     const output = '<table><tr><td width="2000"><sub><kbd>:x: Error</kbd></sub><h3>Test error</h3><i></i><br /></td></tr></table>'
-    jest.spyOn(inputs, 'parseEnv').mockRejectedValue(error)
+    vi.spyOn(inputs, 'parseEnv').mockRejectedValue(error)
 
     await main.run()
     expect(runMock).toHaveReturned()
@@ -212,11 +209,11 @@ describe('run', () => {
     expect(process.exitCode).toBe(core.ExitCode.Failure)
   })
 
-  it('should handle unexpected errors', async () => {
-    const error = new AggregateError()
+  test('should handle unexpected errors', async () => {
+    const error = new AggregationError()
     const output =
       '<table><tr><td width="2000"><sub><kbd>:x: Error</kbd></sub><h3>An unknown error occurred</h3><i>This should not have happened. Please try again. If the error persists, please report it.</i><br /></td></tr></table>'
-    jest.spyOn(inputs, 'parseEnv').mockRejectedValue(error)
+    vi.spyOn(inputs, 'parseEnv').mockRejectedValue(error)
 
     await main.run()
     expect(runMock).toHaveReturned()
@@ -235,39 +232,39 @@ describe('run', () => {
     expect(process.exitCode).toBe(core.ExitCode.Failure)
   })
 
-  it('should handle AggregateError and set the appropriate outputs', async () => {
+  test('should handle AggregationError and set the appropriate outputs', async () => {
     const output = [1, 2, 3, 4]
       .map((idx) => `<table><tr><td width="2000"><sub><kbd>:x: Error</kbd></sub><h3>Test error</h3><i>${idx}</i><br /></td></tr></table>`)
       .join('\n\n')
-    jest.spyOn(inputs, 'parseEnv').mockResolvedValue({} as InputParameters)
-    jest.spyOn(inputs, 'parsePackage').mockImplementation((errors) => {
+    vi.spyOn(inputs, 'parseEnv').mockResolvedValue({} as InputParameters)
+    vi.spyOn(inputs, 'parsePackage').mockImplementation((errors) => {
       errors.push(new VerboseError('Test error', '1'))
       return { templateRepo: '', templateRepoUrl: '', licenseType: '' }
     })
-    jest.spyOn(inputs, 'checkPatchName').mockImplementation((_str, errors) => {
+    vi.spyOn(inputs, 'checkPatchName').mockImplementation((_str, errors) => {
       errors.push(new VerboseError('Test error', '2'))
     })
-    jest.spyOn(inputs, 'checkPatchDesc').mockImplementation((_str, errors) => {
+    vi.spyOn(inputs, 'checkPatchDesc').mockImplementation((_str, errors) => {
       errors.push(new VerboseError('Test error', '3'))
     })
-    jest.spyOn(inputs, 'parseInputs').mockImplementation((_patch, errors) => {
+    vi.spyOn(inputs, 'parseInputs').mockImplementation((_patch, errors) => {
       errors.push(new VerboseError('Test error', '4'))
       return {}
     })
-    jest.spyOn(files, 'createDirs').mockResolvedValue()
-    jest.spyOn(files, 'writeContentSrcFiles').mockResolvedValue()
-    jest.spyOn(files, 'writeSrcFiles').mockResolvedValue()
-    jest.spyOn(files, 'writeOuFiles').mockResolvedValue()
-    jest.spyOn(files, 'writeAnimFiles').mockResolvedValue()
-    jest.spyOn(files, 'writeVmScript').mockResolvedValue()
-    jest.spyOn(files, 'writeDotFiles').mockResolvedValue([])
-    jest.spyOn(files, 'writeReadme').mockResolvedValue()
-    jest.spyOn(files, 'writeLicense').mockResolvedValue()
-    jest.spyOn(files, 'removeFiles').mockResolvedValue()
-    jest.spyOn(infos, 'listNextSteps').mockImplementation()
-    jest.spyOn(infos, 'header').mockImplementation()
-    jest.spyOn(git, 'setupIdentity').mockResolvedValue()
-    jest.spyOn(git, 'commit').mockResolvedValue()
+    vi.spyOn(files, 'createDirs').mockResolvedValue()
+    vi.spyOn(files, 'writeContentSrcFiles').mockResolvedValue()
+    vi.spyOn(files, 'writeSrcFiles').mockResolvedValue()
+    vi.spyOn(files, 'writeOuFiles').mockResolvedValue(undefined)
+    vi.spyOn(files, 'writeAnimFiles').mockResolvedValue(undefined)
+    vi.spyOn(files, 'writeVmScript').mockResolvedValue()
+    vi.spyOn(files, 'writeDotFiles').mockResolvedValue([])
+    vi.spyOn(files, 'writeReadme').mockResolvedValue()
+    vi.spyOn(files, 'writeLicense').mockResolvedValue()
+    vi.spyOn(files, 'removeFiles').mockResolvedValue()
+    vi.spyOn(infos, 'listNextSteps').mockImplementation(() => {})
+    vi.spyOn(infos, 'header').mockImplementation(() => '')
+    vi.spyOn(git, 'setupIdentity').mockResolvedValue()
+    vi.spyOn(git, 'commit').mockResolvedValue()
 
     await main.run()
     expect(runMock).toHaveReturned()

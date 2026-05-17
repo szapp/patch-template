@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { warnings } from './main'
+import { warnings } from './main.js'
 
 export class VerboseError extends Error {
   details: string
@@ -9,7 +9,16 @@ export class VerboseError extends Error {
   }
 }
 
-export class AggregateError extends Error {}
+export class AggregationError extends Error {}
+
+// Adjust the error for missing fields
+z.config({
+  customError: (issue) => {
+    if (issue.code === 'invalid_type' && issue.input === undefined) {
+      return 'Required'
+    }
+  },
+})
 
 const TrueFalse = z
   .union([z.literal('true'), z.literal('false'), z.literal(true), z.literal(false)])
@@ -94,7 +103,7 @@ export const InputParameters = z
       camera: data['Camera scripts'],
       fight: data['Fight AI scripts'],
       ou: data['Output units'],
-      anim: data['Animations'],
+      anim: data.Animations,
       ikarus: data['Ikarus and LeGo'].Ikarus,
       lego: data['Ikarus and LeGo'].LeGo,
       initContent: data['Content initialization'],

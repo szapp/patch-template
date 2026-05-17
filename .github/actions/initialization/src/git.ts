@@ -1,5 +1,5 @@
 import * as exec from '@actions/exec'
-import { InputParameters } from './classes'
+import type { InputParameters } from './classes.js'
 
 export async function setupIdentity(patch: InputParameters): Promise<void> {
   await exec.exec('git', ['config', 'user.name', patch.username])

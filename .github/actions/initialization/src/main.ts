@@ -1,9 +1,9 @@
 import * as core from '@actions/core'
-import { parseInputs, parseEnv, parsePackage, checkPatchName, checkPatchDesc } from './inputs'
-import * as files from './files'
-import { setupIdentity, commit } from './git'
-import { listNextSteps, header } from './infos'
-import { AggregateError, VerboseError, InputParameters } from './classes'
+import { AggregationError, type InputParameters, VerboseError } from './classes.js'
+import * as files from './files.js'
+import { commit, setupIdentity } from './git.js'
+import { header, listNextSteps } from './infos.js'
+import { checkPatchDesc, checkPatchName, parseEnv, parseInputs, parsePackage } from './inputs.js'
 
 export const errors: VerboseError[] = []
 export const warnings: VerboseError[] = []
@@ -36,7 +36,7 @@ export async function run(): Promise<void> {
     const { userinputs } = parseInputs(core.getInput('parameters', { required: true }), errors)
 
     // Handle aggregate errors and terminate
-    if (errors.length > 0) throw new AggregateError()
+    if (errors.length > 0) throw new AggregationError()
 
     // Merge all relevant patch info
     const patch = { ...userinputs, ...envInputs } as InputParameters
@@ -67,7 +67,7 @@ export async function run(): Promise<void> {
     await commit()
   } catch (error) {
     // Collect all errors
-    if (!(error instanceof AggregateError)) {
+    if (!(error instanceof AggregationError)) {
       if (error instanceof VerboseError) errors.push(error)
       else errors.push(new VerboseError(error instanceof Error ? error.message : String(error), ''))
     }
@@ -75,8 +75,8 @@ export async function run(): Promise<void> {
       errors.push(
         new VerboseError(
           'An unknown error occurred',
-          'This should not have happened. Please try again. If the error persists, please report it.'
-        )
+          'This should not have happened. Please try again. If the error persists, please report it.',
+        ),
       )
 
     // Set exit code explicitly

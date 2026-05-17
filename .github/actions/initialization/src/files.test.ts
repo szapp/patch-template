@@ -1,28 +1,33 @@
-import * as files from '../src/files'
-import * as io from '@actions/io'
+import fs from 'node:fs/promises'
+import * as path from 'node:path'
 import * as exec from '@actions/exec'
-import * as path from 'path'
-import fs from 'fs/promises'
-import { InputParameters } from '../src/classes'
+import * as io from '@actions/io'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+import type { InputParameters } from './classes.js'
+import * as files from './files.js'
 
-jest.mock('@actions/io')
-jest.mock('@actions/exec')
-jest.mock('fs/promises')
+vi.mock('@actions/io')
+vi.mock('@actions/exec')
+vi.mock('node:fs/promises')
 
-const createDirsMock = jest.spyOn(files, 'createDirs')
-const writeContentSrcFilesMock = jest.spyOn(files, 'writeContentSrcFiles')
-const writeInitializationMock = jest.spyOn(files, 'writeInitialization')
-const writeSrcFilesMock = jest.spyOn(files, 'writeSrcFiles')
-const writeOuFilesMock = jest.spyOn(files, 'writeOuFiles')
-const writeAnimFilesMock = jest.spyOn(files, 'writeAnimFiles')
-const writeVmScriptMock = jest.spyOn(files, 'writeVmScript')
-const writeDotFilesMock = jest.spyOn(files, 'writeDotFiles')
-const writeReadmeMock = jest.spyOn(files, 'writeReadme')
-const writeLicenseMock = jest.spyOn(files, 'writeLicense')
-const removeFilesMock = jest.spyOn(files, 'removeFiles')
+const createDirsMock = vi.spyOn(files, 'createDirs')
+const writeContentSrcFilesMock = vi.spyOn(files, 'writeContentSrcFiles')
+const writeInitializationMock = vi.spyOn(files, 'writeInitialization')
+const writeSrcFilesMock = vi.spyOn(files, 'writeSrcFiles')
+const writeOuFilesMock = vi.spyOn(files, 'writeOuFiles')
+const writeAnimFilesMock = vi.spyOn(files, 'writeAnimFiles')
+const writeVmScriptMock = vi.spyOn(files, 'writeVmScript')
+const writeDotFilesMock = vi.spyOn(files, 'writeDotFiles')
+const writeReadmeMock = vi.spyOn(files, 'writeReadme')
+const writeLicenseMock = vi.spyOn(files, 'writeLicense')
+const removeFilesMock = vi.spyOn(files, 'removeFiles')
 
 describe('createDirs', () => {
-  it('should create resource directories and Ninja/Content/empty', async () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
+  test('should create resource directories and Ninja/Content/empty', async () => {
     const patch: InputParameters = {
       needsNinja: false,
       needsContentScripts: true,
@@ -62,7 +67,7 @@ describe('createDirs', () => {
     })
   })
 
-  it('should create resource directories and Ninja/Content/', async () => {
+  test('should create resource directories and Ninja/Content/', async () => {
     const patch: InputParameters = {
       needsNinja: false,
       needsContentScripts: true,
@@ -100,7 +105,7 @@ describe('createDirs', () => {
     expect(io.mkdirP).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'Content'))
   })
 
-  it('should create resource directories and Ninja/', async () => {
+  test('should create resource directories and Ninja/', async () => {
     const patch: InputParameters = {
       needsNinja: true,
       needsContentScripts: false,
@@ -138,7 +143,7 @@ describe('createDirs', () => {
     expect(io.mkdirP).toHaveBeenCalledWith(path.join('Ninja', 'testPatch'))
   })
 
-  it('should create resource directories only', async () => {
+  test('should create resource directories only', async () => {
     const patch: InputParameters = {
       needsNinja: false,
       needsContentScripts: false,
@@ -177,7 +182,11 @@ describe('createDirs', () => {
 })
 
 describe('writeContentSrcFiles', () => {
-  it('should write all content source files with ikarus and lego', async () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
+  test('should write all content source files with ikarus and lego', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       needsContentScripts: true,
@@ -194,26 +203,26 @@ describe('writeContentSrcFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledWith(
       path.join(basePath, 'Content_G1.src'),
       'Ikarus\nLeGo\n\n// LIST YOUR FILES HERE\n\nContent\\init.d\n',
-      'ascii'
+      'ascii',
     )
     expect(fs.writeFile).toHaveBeenCalledWith(
       path.join(basePath, 'Content_G112.src'),
       'Ikarus\nLeGo\n\n// LIST YOUR FILES HERE\n\nContent\\init.d\n',
-      'ascii'
+      'ascii',
     )
     expect(fs.writeFile).toHaveBeenCalledWith(
       path.join(basePath, 'Content_G130.src'),
       'Ikarus\nLeGo\n\n// LIST YOUR FILES HERE\n\nContent\\init.d\n',
-      'ascii'
+      'ascii',
     )
     expect(fs.writeFile).toHaveBeenCalledWith(
       path.join(basePath, 'Content_G2.src'),
       'Ikarus\nLeGo\n\n// LIST YOUR FILES HERE\n\nContent\\init.d\n',
-      'ascii'
+      'ascii',
     )
   })
 
-  it('should write only one content source file with ikarus', async () => {
+  test('should write only one content source file with ikarus', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       needsContentScripts: true,
@@ -229,7 +238,7 @@ describe('writeContentSrcFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join(basePath, 'Content_G1.src'), 'Ikarus\n\n// LIST YOUR FILES HERE\n', 'ascii')
   })
 
-  it('should write only one content source file without ikarus and lego', async () => {
+  test('should write only one content source file without ikarus and lego', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       needsContentScripts: true,
@@ -245,7 +254,7 @@ describe('writeContentSrcFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join(basePath, 'Content_G2.src'), '\n// LIST YOUR FILES HERE\n', 'ascii')
   })
 
-  it('should write no content source file', async () => {
+  test('should write no content source file', async () => {
     const emptyContent: number[] = []
     const patch: InputParameters = {
       name: 'testPatch',
@@ -260,7 +269,7 @@ describe('writeContentSrcFiles', () => {
     expect(fs.writeFile).not.toHaveBeenCalled()
   })
 
-  it('should not do anything', async () => {
+  test('should not do anything', async () => {
     const patch: InputParameters = {
       needsContentScripts: false,
     } as InputParameters
@@ -272,7 +281,11 @@ describe('writeContentSrcFiles', () => {
 })
 
 describe('writeInitialization', () => {
-  it('should write menu initialization with LeGo', async () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
+  test('should write menu initialization with LeGo', async () => {
     const patch: InputParameters = {
       needsInit: true,
       ikarus: true,
@@ -298,7 +311,7 @@ func void Ninja_testPatch_Menu(var int menuPtr) {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'Content', 'init.d'), expectedContent)
   })
 
-  it('should write content initialization with LeGo', async () => {
+  test('should write content initialization with LeGo', async () => {
     const patch: InputParameters = {
       needsInit: true,
       ikarus: true,
@@ -324,7 +337,7 @@ func void Ninja_testPatch_Init() {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'Content', 'init.d'), expectedContent)
   })
 
-  it('should write menu initialization with Ikarus', async () => {
+  test('should write menu initialization with Ikarus', async () => {
     const patch: InputParameters = {
       needsInit: true,
       ikarus: true,
@@ -350,7 +363,7 @@ func void Ninja_testPatch_Menu(var int menuPtr) {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'Content', 'init.d'), expectedContent)
   })
 
-  it('should write content initialization with Ikarus', async () => {
+  test('should write content initialization with Ikarus', async () => {
     const patch: InputParameters = {
       needsInit: true,
       ikarus: true,
@@ -376,7 +389,7 @@ func void Ninja_testPatch_Init() {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'Content', 'init.d'), expectedContent)
   })
 
-  it('should write menu and content initialization with LeGo', async () => {
+  test('should write menu and content initialization with LeGo', async () => {
     const patch: InputParameters = {
       needsInit: true,
       ikarus: true,
@@ -412,7 +425,7 @@ func void Ninja_testPatch_Init() {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'Content', 'init.d'), expectedContent)
   })
 
-  it('should write menu and content initialization with Ikarus', async () => {
+  test('should write menu and content initialization with Ikarus', async () => {
     const patch: InputParameters = {
       needsInit: true,
       ikarus: true,
@@ -448,7 +461,7 @@ func void Ninja_testPatch_Init() {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'Content', 'init.d'), expectedContent)
   })
 
-  it('should write menu and content initialization without Ikarus and LeGo', async () => {
+  test('should write menu and content initialization without Ikarus and LeGo', async () => {
     const patch: InputParameters = {
       needsInit: true,
       ikarus: false,
@@ -482,7 +495,7 @@ func void Ninja_testPatch_Init() {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'Content', 'init.d'), expectedContent)
   })
 
-  it('should not write initialization', async () => {
+  test('should not write initialization', async () => {
     const patch: InputParameters = {
       needsInit: false,
     } as InputParameters
@@ -493,7 +506,11 @@ func void Ninja_testPatch_Init() {
 })
 
 describe('writeSrcFiles', () => {
-  it('should write all non-content source files without suffixes', async () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
+  test('should write all non-content source files without suffixes', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       needsScripts: true,
@@ -513,7 +530,7 @@ describe('writeSrcFiles', () => {
       expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', `${name}.src`), '\n')
   })
 
-  it('should write some non-content source files with suffixes', async () => {
+  test('should write some non-content source files with suffixes', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       needsScripts: true,
@@ -543,7 +560,7 @@ describe('writeSrcFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'Camera_G130.src'), '\n')
   })
 
-  it('should not write any non-content source files', async () => {
+  test('should not write any non-content source files', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       needsScripts: false,
@@ -556,7 +573,11 @@ describe('writeSrcFiles', () => {
 })
 
 describe('writeOuFiles', () => {
-  it('should write output unit files for two versions', async () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
+  test('should write output unit files for two versions', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       ou: [112, 130],
@@ -569,7 +590,7 @@ describe('writeOuFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'OU_G130.csl'), expect.any(String))
   })
 
-  it('should write a single output unit file', async () => {
+  test('should write a single output unit file', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       ou: [1, 112, 130, 2],
@@ -581,7 +602,7 @@ describe('writeOuFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'OU.csl'), expect.any(String))
   })
 
-  it('should write no output unit file', async () => {
+  test('should write no output unit file', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       ou: [] as number[],
@@ -594,7 +615,11 @@ describe('writeOuFiles', () => {
 })
 
 describe('writeAnimFiles', () => {
-  it('should write animation files for two versions', async () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
+  test('should write animation files for two versions', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       anim: [112, 130],
@@ -607,7 +632,7 @@ describe('writeAnimFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'Anims_Humans_G130.mds'), expect.any(String))
   })
 
-  it('should write a single animation file', async () => {
+  test('should write a single animation file', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       anim: [1, 112, 130, 2],
@@ -619,7 +644,7 @@ describe('writeAnimFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledWith(path.join('Ninja', 'testPatch', 'Anims_Humans.mds'), expect.any(String))
   })
 
-  it('should write no animation file', async () => {
+  test('should write no animation file', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       anim: [] as number[],
@@ -632,7 +657,7 @@ describe('writeAnimFiles', () => {
 })
 
 describe('writeVmScript', () => {
-  it('should write the VM script', async () => {
+  test('should write the VM script', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       description: 'Test patch description',
@@ -642,13 +667,17 @@ describe('writeVmScript', () => {
     expect(writeVmScriptMock).toHaveReturned()
     expect(fs.writeFile).toHaveBeenCalledWith(
       `${patch.name}.vm`,
-      expect.stringContaining(`[BEGINVDF]\nComment=${patch.description}\nBaseDir=.\\\nVDFName=.\\${patch.name}.vdf`)
+      expect.stringContaining(`[BEGINVDF]\nComment=${patch.description}\nBaseDir=.\\\nVDFName=.\\${patch.name}.vdf`),
     )
   })
 })
 
 describe('writeDotFiles', () => {
-  it('should write all dot files', async () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
+  test('should write all dot files', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       description: 'Test patch description',
@@ -666,7 +695,7 @@ describe('writeDotFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledWith('tool.cfg', expect.stringContaining('Required="314"'))
   })
 
-  it('should write all dot files including toolkit spine dependency', async () => {
+  test('should write all dot files including toolkit spine dependency', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       description: 'Test patch description',
@@ -685,7 +714,7 @@ describe('writeDotFiles', () => {
     expect(fs.writeFile).toHaveBeenCalledWith('tool.cfg', expect.stringContaining('Required="314,613"'))
   })
 
-  it('should write all dot files but the spine dependency', async () => {
+  test('should write all dot files but the spine dependency', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       description: 'Test patch description',
@@ -705,7 +734,7 @@ describe('writeDotFiles', () => {
 })
 
 describe('writeReadme', () => {
-  it('should write the README file with extra badges', async () => {
+  test('should write the README file with extra badges', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       needsScripts: true,
@@ -768,11 +797,11 @@ Instead refer to the PATCH TEMPLATE to build a foundation that is customized to 
 The patch template can found at ${templateRepoUrl}.
 
 -->
-`
+`,
     )
   })
 
-  it('should write the README file without extra badges', async () => {
+  test('should write the README file without extra badges', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       needsScripts: false,
@@ -824,11 +853,11 @@ Instead refer to the PATCH TEMPLATE to build a foundation that is customized to 
 The patch template can found at ${templateRepoUrl}.
 
 -->
-`
+`,
     )
   })
 
-  it('should write the README file with a single steam badge', async () => {
+  test('should write the README file with a single steam badge', async () => {
     const patch: InputParameters = {
       name: 'testPatch',
       needsScripts: true,
@@ -891,21 +920,23 @@ Instead refer to the PATCH TEMPLATE to build a foundation that is customized to 
 The patch template can found at ${templateRepoUrl}.
 
 -->
-`
+`,
     )
   })
 })
 
 describe('writeLicense', () => {
-  it('should write the LICENSE file', async () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
+  test('should write the LICENSE file', async () => {
     const patch: InputParameters = {
       usernameFull: 'John Doe',
     } as InputParameters
-    jest
-      .spyOn(fs, 'readFile')
-      .mockImplementation(async (file) =>
-        (file as string).includes('GothicMOD-Lizenz.txt') ? 'Copyright (c) 20[jj] [Inhaber der ausschließlichen Nutzungsrechte].' : ''
-      )
+    vi.spyOn(fs, 'readFile').mockImplementation(async (file) =>
+      (file as string).includes('GothicMOD-Lizenz.txt') ? 'Copyright (c) 20[jj] [Inhaber der ausschließlichen Nutzungsrechte].' : '',
+    )
 
     await files.writeLicense(patch)
     expect(writeLicenseMock).toHaveReturned()
@@ -913,20 +944,24 @@ describe('writeLicense', () => {
     expect(fs.readFile).toHaveBeenCalledWith(path.join('.github', 'actions', 'initialization', 'licenses', 'GothicMOD-Lizenz.txt'), 'utf8')
     expect(fs.readFile).toHaveBeenCalledWith(
       path.join('.github', 'actions', 'initialization', 'licenses', 'GOTHIC_MOD_Development_Kit.txt'),
-      'utf8'
+      'utf8',
     )
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
     expect(fs.writeFile).toHaveBeenNthCalledWith(
       1,
       'LICENSE',
-      expect.stringContaining(new Date().getUTCFullYear() + ' ' + patch.usernameFull),
-      'utf8'
+      expect.stringContaining(`${new Date().getUTCFullYear()} ${patch.usernameFull}`),
+      'utf8',
     )
   })
 })
 
 describe('removeFiles', () => {
-  it('should remove dot-files except for scripts.yml', async () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
+  test('should remove dot-files except for scripts.yml', async () => {
     const patch: InputParameters = {
       needsScripts: true,
     } as InputParameters
@@ -941,7 +976,7 @@ describe('removeFiles', () => {
     expect(io.rmRF).not.toHaveBeenCalledWith('.github/workflows/scripts.yml')
   })
 
-  it('should remove dot-files including scripts.yml', async () => {
+  test('should remove dot-files including scripts.yml', async () => {
     const patch: InputParameters = {
       needsScripts: false,
     } as InputParameters

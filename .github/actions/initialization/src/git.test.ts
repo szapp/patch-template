@@ -1,19 +1,20 @@
 import * as exec from '@actions/exec'
-import * as git from '../src/git'
-import { InputParameters } from '../src/classes'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+import type { InputParameters } from './classes.js'
+import * as git from './git.js'
 
-jest.mock('@actions/exec')
+vi.mock('@actions/exec')
 
-const setupIdentityMock = jest.spyOn(git, 'setupIdentity')
-const commitMock = jest.spyOn(git, 'commit')
+const setupIdentityMock = vi.spyOn(git, 'setupIdentity')
+const commitMock = vi.spyOn(git, 'commit')
 
 describe('git', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('setupIdentity', () => {
-    it('should set git user name and email', async () => {
+    test('should set git user name and email', async () => {
       const patch: InputParameters = {
         username: 'john-doe',
         userEmail: 'john.doe@example.com',
@@ -27,7 +28,7 @@ describe('git', () => {
   })
 
   describe('commit', () => {
-    it('should create a new branch, add files, commit, and push', async () => {
+    test('should create a new branch, add files, commit, and push', async () => {
       await git.commit()
       expect(commitMock).toHaveReturned()
       expect(exec.exec).toHaveBeenNthCalledWith(1, 'git', ['checkout', '--orphan', 'init'])
